@@ -65,5 +65,8 @@ __recovery/
 # Castalia statistics file (since XE7 Castalia is distributed with Delphi)
 *.stat
 
-# Boss dependency manager vendor folder https://github.com/HashLoad/boss
-modules/
+# ignore auto-generated project .res files
+*.res
+
+# ignore auto-created DevExpress skin configuration file
+*.skincfg
