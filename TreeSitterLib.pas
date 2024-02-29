@@ -43,11 +43,11 @@ type
   TSStateId = UInt16;
   TSSymbol = UInt16;
   TSFieldId = UInt16;
-  PSLanguage = ^TSLanguage;
+  PTSLanguage = ^TSLanguage;
   TSLanguage = record end;
-  PSParser = ^TSParser;
+  PTSParser = ^TSParser;
   TSParser = record end;
-  PSTree = ^TSTree;
+  PTSTree = ^TSTree;
   TSTree = record end;
   TSQuery = record end;
   TSQueryCursor = record end;
@@ -98,7 +98,7 @@ typedef struct TSInputEdit {
     TSNode = packed record
       context: array[1..4] of UInt32;
       id: Pointer;
-      tree: PSTree;
+      tree: PTSTree;
     end;
 (*
 typedef struct TSTreeCursor {
@@ -150,19 +150,19 @@ typedef enum TSQueryError {
  * Create a new parser.
  */
 *)
-function ts_parser_new(): PSParser; cdecl; external ModuleName;
+function ts_parser_new(): PTSParser; cdecl; external ModuleName;
 (*
 /**
  * Delete the parser, freeing all of the memory that it used.
  */
 *)
-procedure ts_parser_delete(self: PSParser); cdecl; external ModuleName;
+procedure ts_parser_delete(self: PTSParser); cdecl; external ModuleName;
 (*
 /**
  * Get the parser's current language.
  */
 *)
-function ts_parser_language(self: PSParser): PSLanguage; cdecl; external ModuleName;
+function ts_parser_language(self: PTSParser): PTSLanguage; cdecl; external ModuleName;
 (*
 /**
  * Set the language that the parser should use for parsing.
@@ -175,7 +175,7 @@ function ts_parser_language(self: PSParser): PSLanguage; cdecl; external ModuleN
  * [`TREE_SITTER_MIN_COMPATIBLE_LANGUAGE_VERSION`] constants.
  */
 *)
-function ts_parser_set_language(self: PSParser; language: PSLanguage): Boolean; cdecl; external ModuleName;
+function ts_parser_set_language(self: PTSParser; language: PTSLanguage): Boolean; cdecl; external ModuleName;
 {
 /**
  * Set the ranges of text that the parser should include when parsing.
@@ -273,11 +273,11 @@ TSTree *ts_parser_parse(
  */
 *)
 function ts_parser_parse_string(
-  self: PSParser;
-  old_tree: PSTree;
+  self: PTSParser;
+  old_tree: PTSTree;
    _string: PAnsiChar;
   length: UInt32
-): PSTree; cdecl; external ModuleName;
+): PTSTree; cdecl; external ModuleName;
 (*
 /**
  * Use the parser to parse some source code stored in one contiguous buffer with
@@ -287,12 +287,12 @@ function ts_parser_parse_string(
  */
 *)
 function ts_parser_parse_string_encoding(
-  self: PSParser;
-  old_tree: PSTree;
+  self: PTSParser;
+  old_tree: PTSTree;
   _string: PByte;
   length: UInt32;
   encoding: TSInputEncoding
-): PSTree; cdecl; external ModuleName;
+): PTSTree; cdecl; external ModuleName;
 (*
 /**
  * Instruct the parser to start the next parse from the beginning.
@@ -361,13 +361,13 @@ TSTree *ts_tree_copy(const TSTree *self);
  * Delete the syntax tree, freeing all of the memory that it used.
  */
 *)
-procedure ts_tree_delete(self: PSTree); cdecl; external ModuleName;
+procedure ts_tree_delete(self: PTSTree); cdecl; external ModuleName;
 (*
 /**
  * Get the root node of the syntax tree.
  */
 *)
-function ts_tree_root_node(self: PSTree): TSNode; cdecl; external ModuleName;
+function ts_tree_root_node(self: PTSTree): TSNode; cdecl; external ModuleName;
 (*
 /**
  * Get the root node of the syntax tree, but with its position
