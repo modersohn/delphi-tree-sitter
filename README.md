@@ -26,3 +26,9 @@ Most parsers do not seem to come with zig-support out of the box, but it should 
 
 [tree-sitter-c]: https://github.com/tree-sitter/tree-sitter-c
 [zig]: https://ziglang.org
+
+## VCL demo project
+
+![DTSVCLDemo](https://github.com/modersohn/delphi-tree-sitter/assets/44807458/89f4f4e2-b0e4-486e-86b5-a20ce3d93cd6)
+
+Currently only supports a few languages and a very basic tree showing named nodes only.
