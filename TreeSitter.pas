@@ -14,6 +14,7 @@ type
 
   TTSTree = class;
   TTSNode = TSNode;
+  TTSPoint = TSPoint;
 
   TTSParser = class
   strict private
@@ -46,6 +47,14 @@ type
   TTSNodeHelper = record helper for TTSNode
     function NodeType: string;
     function IsNull: Boolean;
+    function IsError: Boolean;
+    function HasError: Boolean;
+    function HasChanges: Boolean;
+    function IsExtra: Boolean;
+    function IsMissing: Boolean;
+    function IsNamed: Boolean;
+    function Parent: TTSNode;
+    function ToString: string;
 
     function ChildCount: Integer;
     function Child(AIndex: Integer): TTSNode;
@@ -56,6 +65,11 @@ type
     function NamedChild(AIndex: Integer): TTSNode;
     function NextNamedSibling: TTSNode;
     function PrevNamedSibling: TTSNode;
+
+    function StartByte: UInt32;
+    function StartPoint: TTSPoint;
+    function EndByte: UInt32;
+    function EndPoint: TTSPoint;
   end;
 
 implementation
@@ -140,6 +154,47 @@ begin
   Result:= ts_node_child_count(Self);
 end;
 
+function TTSNodeHelper.EndByte: UInt32;
+begin
+  Result:= ts_node_end_byte(Self);
+end;
+
+function TTSNodeHelper.EndPoint: TTSPoint;
+begin
+  Result:= Default(TTSPoint);
+  Result:= ts_node_end_point(Self);
+end;
+
+function TTSNodeHelper.HasChanges: Boolean;
+begin
+  Result:= ts_node_has_changes(Self);
+end;
+
+function TTSNodeHelper.HasError: Boolean;
+begin
+  Result:= ts_node_has_error(Self);
+end;
+
+function TTSNodeHelper.IsError: Boolean;
+begin
+  Result:= ts_node_is_error(Self);
+end;
+
+function TTSNodeHelper.IsExtra: Boolean;
+begin
+  Result:= ts_node_is_extra(Self);
+end;
+
+function TTSNodeHelper.IsMissing: Boolean;
+begin
+  Result:= ts_node_is_missing(Self);
+end;
+
+function TTSNodeHelper.IsNamed: Boolean;
+begin
+  Result:= ts_node_is_named(Self);
+end;
+
 function TTSNodeHelper.IsNull: Boolean;
 begin
   Result:= ts_node_is_null(Self);
@@ -170,6 +225,11 @@ begin
   Result:= string(AnsiString(ts_node_type(Self)));
 end;
 
+function TTSNodeHelper.Parent: TTSNode;
+begin
+  Result:= ts_node_parent(Self);
+end;
+
 function TTSNodeHelper.PrevNamedSibling: TTSNode;
 begin
   Result:= ts_node_prev_named_sibling(Self);
@@ -178,6 +238,26 @@ end;
 function TTSNodeHelper.PrevSibling: TTSNode;
 begin
   Result:= ts_node_prev_sibling(Self);
+end;
+
+function TTSNodeHelper.StartByte: UInt32;
+begin
+  Result:= ts_node_start_byte(Self);
+end;
+
+function TTSNodeHelper.StartPoint: TTSPoint;
+begin
+  Result:= Default(TTSPoint);
+  Result:= ts_node_start_point(Self);
+end;
+
+function TTSNodeHelper.ToString: string;
+var
+  pach: PAnsiChar;
+begin
+  pach:= ts_node_string(Self);
+  Result:= string(AnsiString(pach));
+  FreeMem(pach);
 end;
 
 { memory management functions }

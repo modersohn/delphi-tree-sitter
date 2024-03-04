@@ -56,16 +56,14 @@ type
   {$MINENUMSIZE 4}
   TSInputEncoding = (TSInputEncodingUTF8, TSInputEncodingUTF16);
 
+  TSSymbolType = (TSSymbolTypeRegular, TSSymbolTypeAnonymous,
+    TSSymbolTypeAuxiliary);
+
+  TSPoint = packed record
+    row: UInt32;
+    column: UInt32;
+  end;
 (*
-typedef enum TSSymbolType {
-  TSSymbolTypeRegular,
-  TSSymbolTypeAnonymous,
-  TSSymbolTypeAuxiliary,
-} TSSymbolType;
-typedef struct TSPoint {
-  uint32_t row;
-  uint32_t column;
-} TSPoint;
 typedef struct TSRange {
   TSPoint start_point;
   TSPoint end_point;
@@ -452,20 +450,27 @@ TSSymbol ts_node_grammar_symbol(TSNode self);
 /**
  * Get the node's start byte.
  */
-uint32_t ts_node_start_byte(TSNode self);
+*)
+function ts_node_start_byte(self: TSNode): UInt32; cdecl; external ModuleName;
+(*
 /**
  * Get the node's start position in terms of rows and columns.
  */
-TSPoint ts_node_start_point(TSNode self);
+*)
+function ts_node_start_point(self: TSNode): TSPoint; cdecl; external ModuleName;
+(*
 /**
  * Get the node's end byte.
  */
-uint32_t ts_node_end_byte(TSNode self);
+*)
+function ts_node_end_byte(self: TSNode): UInt32; cdecl; external ModuleName;
+(*
 /**
  * Get the node's end position in terms of rows and columns.
  */
-TSPoint ts_node_end_point(TSNode self);
-*)(*
+*)
+function ts_node_end_point(self: TSNode): TSPoint; cdecl; external ModuleName;
+(*
 /**
  * Get an S-expression representing the node as a string.
  *
@@ -488,29 +493,41 @@ function ts_node_is_null(self: TSNode): Boolean; cdecl; external ModuleName;
  * grammar, whereas *anonymous* nodes correspond to string literals in the
  * grammar.
  */
-bool ts_node_is_named(TSNode self);
+*)
+function ts_node_is_named(self: TSNode): Boolean; cdecl; external ModuleName;
+(*
 /**
  * Check if the node is *missing*. Missing nodes are inserted by the parser in
  * order to recover from certain kinds of syntax errors.
  */
-bool ts_node_is_missing(TSNode self);
+*)
+function ts_node_is_missing(self: TSNode): Boolean; cdecl; external ModuleName;
+(*
 /**
  * Check if the node is *extra*. Extra nodes represent things like comments,
  * which are not required the grammar, but can appear anywhere.
  */
-bool ts_node_is_extra(TSNode self);
+*)
+function ts_node_is_extra(self: TSNode): Boolean; cdecl; external ModuleName;
+(*
 /**
  * Check if a syntax node has been edited.
  */
-bool ts_node_has_changes(TSNode self);
+*)
+function ts_node_has_changes(self: TSNode): Boolean; cdecl; external ModuleName;
+(*
 /**
  * Check if the node is a syntax error or contains any syntax errors.
  */
-bool ts_node_has_error(TSNode self);
+*)
+function ts_node_has_error(self: TSNode): Boolean; cdecl; external ModuleName;
+(*
 /**
  * Check if the node is a syntax error.
 */
-bool ts_node_is_error(TSNode self);
+*)
+function ts_node_is_error(self: TSNode): Boolean; cdecl; external ModuleName;
+(*
 /**
  * Get this node's parse state.
 */
@@ -519,11 +536,13 @@ TSStateId ts_node_parse_state(TSNode self);
  * Get the parse state after this node.
 */
 TSStateId ts_node_next_parse_state(TSNode self);
+*)
+(*
 /**
  * Get the node's immediate parent.
  */
-TSNode ts_node_parent(TSNode self);
 *)
+function ts_node_parent(self: TSNode): TSNode; cdecl; external ModuleName;
 (*
 /**
  * Get the node's child at the given index, where zero represents the first
