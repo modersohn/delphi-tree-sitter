@@ -29,6 +29,7 @@ Most parsers do not seem to come with zig-support out of the box, but it should 
 
 ## VCL demo project
 
-![DTSVCLDemo](https://github.com/modersohn/delphi-tree-sitter/assets/44807458/89f4f4e2-b0e4-486e-86b5-a20ce3d93cd6)
+![image](https://github.com/modersohn/delphi-tree-sitter/assets/44807458/8596130e-d280-4689-9148-145800c7c3ff)
 
-Currently only supports a few languages and a very basic tree showing named nodes only.
+
+Currently only supports a few languages and a very basic tree showing named nodes only. Now selects the corresponding code part in the memo when a node gets selected.
