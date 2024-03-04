@@ -26,9 +26,12 @@ type
       var AllowExpansion: Boolean);
     procedure btnLoadClick(Sender: TObject);
     procedure cbCodeChange(Sender: TObject);
+    procedure treeViewChange(Sender: TObject; Node: TTreeNode);
+    procedure memCodeChange(Sender: TObject);
   private
     FParser: TTSParser;
     FTree: TTSTree;
+    FEditChanged: Boolean;
     procedure ParseContent;
     procedure LoadLanguageParser(const ALangBaseName: string);
   public
@@ -53,6 +56,7 @@ begin
   if not OD.Execute(Handle) then
     Exit;
   memCode.Lines.LoadFromFile(OD.FileName);
+  FEditChanged:= True;
   ParseContent;
 end;
 
@@ -100,14 +104,38 @@ end;
 procedure TDTSMain.ParseContent;
 var
   oldTree: TTSTree;
+  root: TTSNode;
+  rootNode: TTSTreeViewNode;
 begin
   oldTree:= FTree;
   FTree:= FParser.ParseString(memCode.Lines.Text, oldTree);
   oldTree.Free;
   treeView.Items.Clear;
-  var root:= FTree.RootNode;
-  var rootNode:= TTSTreeViewNode(treeView.Items.AddChild(nil, root.NodeType));
+  root:= FTree.RootNode;
+  rootNode:= TTSTreeViewNode(treeView.Items.AddChild(nil, root.NodeType));
   rootNode.SetupTSNode(root);
+  FEditChanged:= False;
+end;
+
+procedure TDTSMain.treeViewChange(Sender: TObject; Node: TTreeNode);
+var
+  tsSelected: TTSNode;
+  ptStart, ptEnd: TTSPoint;
+  memSel: TSelection;
+begin
+  if Node = nil then
+    Exit;
+  tsSelected:= TTSTreeViewNode(Node).TSNode;
+  ptStart:= tsSelected.StartPoint;
+  ptEnd:= tsSelected.EndPoint;
+
+  //TSPoint.Column is in bytes, we use UTF16, so divide by 2 to get character,
+  //which is a simplification not necessarily true
+  memSel.StartPos:= memcode.Perform(EM_LineIndex, ptStart.row, 0) + ptStart.column div 2;
+  memSel.EndPos:= memcode.Perform(EM_LineIndex, ptEnd.row, 0) + ptEnd.column div 2;
+
+  SendMessage(memCode.Handle, EM_SETSEL, memSel.StartPos, memSel.EndPos);
+  SendMessage(memCode.Handle, EM_SCROLLCARET, 0, 0);
 end;
 
 procedure TDTSMain.treeViewCreateNodeClass(Sender: TCustomTreeView;
@@ -133,9 +161,15 @@ begin
     end;
 end;
 
+procedure TDTSMain.memCodeChange(Sender: TObject);
+begin
+  FEditChanged:= True;
+end;
+
 procedure TDTSMain.memCodeExit(Sender: TObject);
 begin
-  ParseContent;
+  if FEditChanged then
+    ParseContent;
 end;
 
 { TTSTreeViewNode }

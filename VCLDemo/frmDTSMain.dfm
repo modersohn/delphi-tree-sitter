@@ -33,9 +33,11 @@ object DTSMain: TDTSMain
     Font.Height = -15
     Font.Name = 'Consolas'
     Font.Style = []
+    HideSelection = False
     ParentFont = False
     ScrollBars = ssBoth
     TabOrder = 1
+    OnChange = memCodeChange
     OnExit = memCodeExit
   end
   object pnlTop: TPanel
@@ -85,6 +87,7 @@ object DTSMain: TDTSMain
     Indent = 19
     ReadOnly = True
     TabOrder = 2
+    OnChange = treeViewChange
     OnCreateNodeClass = treeViewCreateNodeClass
     OnExpanding = treeViewExpanding
   end
