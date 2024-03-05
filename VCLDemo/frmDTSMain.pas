@@ -113,8 +113,6 @@ begin
 end;
 
 procedure TDTSMain.FillNodeProps(const ANode: TTSNode);
-var
-  row: TSGNodePropRow;
 begin
   sgNodeProps.Cells[1, Ord(rowSymbol)]:= IntToStr(ANode.Symbol);
   sgNodeProps.Cells[1, Ord(rowGrammarType)]:= ANode.GrammarType;
