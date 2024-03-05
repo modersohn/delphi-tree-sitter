@@ -105,6 +105,7 @@ object DTSMain: TDTSMain
       Align = alClient
       HideSelection = False
       Indent = 19
+      PopupMenu = pmTree
       ReadOnly = True
       TabOrder = 0
       OnChange = treeViewChange
@@ -136,5 +137,29 @@ object DTSMain: TDTSMain
     Options = []
     Left = 376
     Top = 248
+  end
+  object AL: TActionList
+    Left = 344
+    Top = 336
+    object actGoto: TAction
+      Caption = 'Go to'
+      OnExecute = actGotoExecute
+      OnUpdate = actGotoUpdate
+    end
+    object actGotoParent: TAction
+      Caption = 'Parent'
+      OnExecute = actGotoParentExecute
+      OnUpdate = actGotoParentUpdate
+    end
+  end
+  object pmTree: TPopupMenu
+    Left = 416
+    Top = 304
+    object mnuactGoto: TMenuItem
+      Action = actGoto
+      object mnuactGotoParent: TMenuItem
+        Action = actGotoParent
+      end
+    end
   end
 end

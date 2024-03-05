@@ -5,7 +5,8 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
-  Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.StdCtrls, TreeSitter, Vcl.Grids;
+  Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.StdCtrls, TreeSitter, Vcl.Grids,
+  System.Actions, Vcl.ActnList, Vcl.Menus;
 
 type
   TDTSMain = class(TForm)
@@ -20,6 +21,12 @@ type
     Splitter2: TSplitter;
     Panel1: TPanel;
     sgNodeProps: TStringGrid;
+    AL: TActionList;
+    actGoto: TAction;
+    actGotoParent: TAction;
+    pmTree: TPopupMenu;
+    mnuactGoto: TMenuItem;
+    mnuactGotoParent: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure memCodeExit(Sender: TObject);
@@ -31,6 +38,10 @@ type
     procedure cbCodeChange(Sender: TObject);
     procedure treeViewChange(Sender: TObject; Node: TTreeNode);
     procedure memCodeChange(Sender: TObject);
+    procedure actGotoUpdate(Sender: TObject);
+    procedure actGotoParentExecute(Sender: TObject);
+    procedure actGotoParentUpdate(Sender: TObject);
+    procedure actGotoExecute(Sender: TObject);
   private
     FParser: TTSParser;
     FTree: TTSTree;
@@ -39,8 +50,10 @@ type
     procedure LoadLanguageParser(const ALangBaseName: string);
     procedure FillNodeProps(const ANode: TTSNode);
     procedure ClearNodeProps;
+    function GetSelectedTSNode: TTSNode;
+    procedure SetSelectedTSNode(const Value: TTSNode);
   public
-    { Public declarations }
+    property SelectedTSNode: TTSNode read GetSelectedTSNode write SetSelectedTSNode;
   end;
 
   TTSTreeViewNode = class(TTreeNode)
@@ -66,6 +79,26 @@ const
     'Symbol', 'GrammarType', 'GrammarSymbol', 'IsError',
     'HasError', 'IsExtra', 'IsMissing', 'IsNamed', 'ChildCount',
     'NamedChildCount', 'StartByte', 'StartPoint', 'EndByte', 'EndPoint');
+
+procedure TDTSMain.actGotoExecute(Sender: TObject);
+begin
+  //to keep it enabled
+end;
+
+procedure TDTSMain.actGotoParentExecute(Sender: TObject);
+begin
+  SelectedTSNode:= SelectedTSNode.Parent;
+end;
+
+procedure TDTSMain.actGotoParentUpdate(Sender: TObject);
+begin
+  actGotoParent.Enabled:= not SelectedTSNode.Parent.IsNull;
+end;
+
+procedure TDTSMain.actGotoUpdate(Sender: TObject);
+begin
+  actGoto.Enabled:= not SelectedTSNode.IsNull;
+end;
 
 procedure TDTSMain.btnLoadClick(Sender: TObject);
 begin
@@ -150,6 +183,13 @@ begin
   FreeAndNil(FParser);
 end;
 
+function TDTSMain.GetSelectedTSNode: TTSNode;
+begin
+  if treeView.Selected is TTSTreeViewNode then
+    Result:= TTSTreeViewNode(treeView.Selected).TSNode else
+    Result:= FTree.RootNode.Parent; //easy way to create a NULL node
+end;
+
 procedure TDTSMain.ParseContent;
 var
   oldTree: TTSTree;
@@ -164,6 +204,37 @@ begin
   rootNode:= TTSTreeViewNode(treeView.Items.AddChild(nil, root.NodeType));
   rootNode.SetupTSNode(root);
   FEditChanged:= False;
+end;
+
+procedure TDTSMain.SetSelectedTSNode(const Value: TTSNode);
+
+  function FindViaParent(const ATSNode: TTSNode): TTreeNode;
+  var
+    tsParent: TTSNode;
+  begin
+    tsParent:= ATSNode.Parent;
+    if tsParent.IsNull then
+      Result:= treeView.Items.GetFirstNode else
+    begin
+      Result:= FindViaParent(tsParent);
+      if Result <> nil then
+      begin
+        Result.Expand(False);
+        Result:= Result.getFirstChild;
+      end;
+    end;
+    if Result = nil then
+      Exit;
+    while Result is TTSTreeViewNode do
+    begin
+      if TTSTreeViewNode(Result).TSNode = ATSNode then
+        Exit;
+      Result:= Result.getNextSibling as TTSTreeViewNode;
+    end;
+  end;
+
+begin
+  treeView.Selected:= FindViaParent(Value);
 end;
 
 procedure TDTSMain.treeViewChange(Sender: TObject; Node: TTreeNode);
