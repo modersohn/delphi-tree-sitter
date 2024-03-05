@@ -46,6 +46,10 @@ type
 
   TTSNodeHelper = record helper for TTSNode
     function NodeType: string;
+    function Symbol: TSSymbol;
+    function GrammarType: string;
+    function GrammarSymbol: TSSymbol;
+
     function IsNull: Boolean;
     function IsError: Boolean;
     function HasError: Boolean;
@@ -70,7 +74,14 @@ type
     function StartPoint: TTSPoint;
     function EndByte: UInt32;
     function EndPoint: TTSPoint;
+
+    class operator Equal(A: TTSNode; B: TTSNode): Boolean;
   end;
+
+  TTSPointHelper = record helper for TTSPoint
+    function ToString: string;
+  end;
+
 
 implementation
 
@@ -165,6 +176,21 @@ begin
   Result:= ts_node_end_point(Self);
 end;
 
+class operator TTSNodeHelper.Equal(A, B: TTSNode): Boolean;
+begin
+  Result:= ts_node_eq(A, B);
+end;
+
+function TTSNodeHelper.GrammarSymbol: TSSymbol;
+begin
+  Result:= ts_node_grammar_symbol(Self);
+end;
+
+function TTSNodeHelper.GrammarType: string;
+begin
+  Result:= string(AnsiString(ts_node_grammar_type(Self)));
+end;
+
 function TTSNodeHelper.HasChanges: Boolean;
 begin
   Result:= ts_node_has_changes(Self);
@@ -251,6 +277,11 @@ begin
   Result:= ts_node_start_point(Self);
 end;
 
+function TTSNodeHelper.Symbol: TSSymbol;
+begin
+  Result:= ts_node_symbol(Self);
+end;
+
 function TTSNodeHelper.ToString: string;
 var
   pach: PAnsiChar;
@@ -258,6 +289,13 @@ begin
   pach:= ts_node_string(Self);
   Result:= string(AnsiString(pach));
   FreeMem(pach);
+end;
+
+{ TTSPointHelper }
+
+function TTSPointHelper.ToString: string;
+begin
+  Result:= Format('(%d, %d)', [column, row]);
 end;
 
 { memory management functions }

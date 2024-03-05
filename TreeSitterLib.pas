@@ -431,22 +431,30 @@ function ts_node_type(self: TSNode): PAnsiChar; cdecl; external ModuleName;
 /**
  * Get the node's type as a numerical id.
  */
-TSSymbol ts_node_symbol(TSNode self);
+*)
+function ts_node_symbol(self: TSNode): TSSymbol; cdecl; external ModuleName;
+(*
 /**
  * Get the node's language.
  */
-const TSLanguage *ts_node_language(TSNode self);
+*)
+function ts_node_language(self: TSNode): PTSLanguage; cdecl; external ModuleName;
+(*
 /**
  * Get the node's type as it appears in the grammar ignoring aliases as a
  * null-terminated string.
  */
-const char *ts_node_grammar_type(TSNode self);
+*)
+function ts_node_grammar_type(self: TSNode): PAnsiChar; cdecl; external ModuleName;
+(*
 /**
  * Get the node's type as a numerical id as it appears in the grammar ignoring
  * aliases. This should be used in [`ts_language_next_state`] instead of
  * [`ts_node_symbol`].
  */
-TSSymbol ts_node_grammar_symbol(TSNode self);
+*)
+function ts_node_grammar_symbol(self: TSNode): TSSymbol; cdecl; external ModuleName;
+(*
 /**
  * Get the node's start byte.
  */
@@ -645,10 +653,14 @@ TSNode ts_node_named_descendant_for_point_range(TSNode self, TSPoint start, TSPo
  * after an edit.
  */
 void ts_node_edit(TSNode *self, const TSInputEdit *edit);
+*)
+(*
 /**
  * Check if two nodes are identical.
  */
-bool ts_node_eq(TSNode self, TSNode other);
+*)
+function ts_node_eq(self, other: TSNode): Boolean; cdecl; external ModuleName;
+(*
 /************************/
 /* Section - TreeCursor */
 /************************/

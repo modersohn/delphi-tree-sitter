@@ -14,18 +14,18 @@ object DTSMain: TDTSMain
   OnDestroy = FormDestroy
   TextHeight = 15
   object Splitter1: TSplitter
-    Left = 462
+    Left = 512
     Top = 50
     Height = 428
     Align = alRight
-    ExplicitLeft = 320
-    ExplicitTop = 192
-    ExplicitHeight = 100
+    ExplicitLeft = 568
+    ExplicitTop = 45
+    ExplicitHeight = 425
   end
   object memCode: TMemo
     Left = 0
     Top = 50
-    Width = 462
+    Width = 512
     Height = 428
     Align = alClient
     Font.Charset = ANSI_CHARSET
@@ -78,18 +78,52 @@ object DTSMain: TDTSMain
         'proto')
     end
   end
-  object treeView: TTreeView
-    Left = 465
+  object Panel1: TPanel
+    Left = 515
     Top = 50
-    Width = 300
+    Width = 250
     Height = 428
     Align = alRight
-    Indent = 19
-    ReadOnly = True
+    Caption = 'Panel1'
     TabOrder = 2
-    OnChange = treeViewChange
-    OnCreateNodeClass = treeViewCreateNodeClass
-    OnExpanding = treeViewExpanding
+    object Splitter2: TSplitter
+      Left = 1
+      Top = 174
+      Width = 248
+      Height = 3
+      Cursor = crVSplit
+      Align = alBottom
+      ExplicitLeft = 3
+      ExplicitTop = 295
+      ExplicitWidth = 183
+    end
+    object treeView: TTreeView
+      Left = 1
+      Top = 1
+      Width = 248
+      Height = 173
+      Align = alClient
+      HideSelection = False
+      Indent = 19
+      ReadOnly = True
+      TabOrder = 0
+      OnChange = treeViewChange
+      OnCreateNodeClass = treeViewCreateNodeClass
+      OnExpanding = treeViewExpanding
+    end
+    object sgNodeProps: TStringGrid
+      Left = 1
+      Top = 177
+      Width = 248
+      Height = 250
+      Align = alBottom
+      ColCount = 2
+      DefaultColWidth = 100
+      DefaultRowHeight = 18
+      FixedRows = 0
+      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goFixedRowDefAlign]
+      TabOrder = 1
+    end
   end
   object OD: TFileOpenDialog
     ClientGuid = '{58D00BB6-8E09-48B3-B19E-7E86D8D6B167}'

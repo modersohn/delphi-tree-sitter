@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
-  Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.StdCtrls, TreeSitter;
+  Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.StdCtrls, TreeSitter, Vcl.Grids;
 
 type
   TDTSMain = class(TForm)
@@ -17,6 +17,9 @@ type
     btnLoad: TButton;
     lblCode: TLabel;
     cbCode: TComboBox;
+    Splitter2: TSplitter;
+    Panel1: TPanel;
+    sgNodeProps: TStringGrid;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure memCodeExit(Sender: TObject);
@@ -34,6 +37,8 @@ type
     FEditChanged: Boolean;
     procedure ParseContent;
     procedure LoadLanguageParser(const ALangBaseName: string);
+    procedure FillNodeProps(const ANode: TTSNode);
+    procedure ClearNodeProps;
   public
     { Public declarations }
   end;
@@ -50,6 +55,17 @@ var
 implementation
 
 {$R *.dfm}
+
+type
+  TSGNodePropRow = (rowSymbol, rowGrammarType, rowGrammarSymbol, rowIsError,
+    rowHasError, rowIsExtra, rowIsMissing, rowIsNamed, rowChildCount,
+    rowNamedChildCount, rowStartByte, rowStartPoint, rowEndByte, rowEndPoint);
+
+const
+  sgNodePropCaptions: array[TSGNodePropRow] of string = (
+    'Symbol', 'GrammarType', 'GrammarSymbol', 'IsError',
+    'HasError', 'IsExtra', 'IsMissing', 'IsNamed', 'ChildCount',
+    'NamedChildCount', 'StartByte', 'StartPoint', 'EndByte', 'EndPoint');
 
 procedure TDTSMain.btnLoadClick(Sender: TObject);
 begin
@@ -88,8 +104,43 @@ begin
   LoadLanguageParser(cbCode.Items[cbCode.ItemIndex]);
 end;
 
-procedure TDTSMain.FormCreate(Sender: TObject);
+procedure TDTSMain.ClearNodeProps;
+var
+  row: TSGNodePropRow;
 begin
+  for row:= Low(TSGNodePropRow) to High(TSGNodePropRow) do
+    sgNodeProps.Cells[1, Ord(row)]:= '';
+end;
+
+procedure TDTSMain.FillNodeProps(const ANode: TTSNode);
+var
+  row: TSGNodePropRow;
+begin
+  sgNodeProps.Cells[1, Ord(rowSymbol)]:= IntToStr(ANode.Symbol);
+  sgNodeProps.Cells[1, Ord(rowGrammarType)]:= ANode.GrammarType;
+  sgNodeProps.Cells[1, Ord(rowGrammarSymbol)]:= IntToStr(ANode.GrammarSymbol);
+  sgNodeProps.Cells[1, Ord(rowIsError)]:= BoolToStr(ANode.IsError, True);
+  sgNodeProps.Cells[1, Ord(rowHasError)]:= BoolToStr(ANode.HasError, True);
+  sgNodeProps.Cells[1, Ord(rowIsExtra)]:= BoolToStr(ANode.IsExtra, True);
+  sgNodeProps.Cells[1, Ord(rowIsMissing)]:= BoolToStr(ANode.IsMissing, True);
+  sgNodeProps.Cells[1, Ord(rowIsNamed)]:= BoolToStr(ANode.IsNamed, True);
+  sgNodeProps.Cells[1, Ord(rowChildCount)]:= IntToStr(ANode.ChildCount);
+  sgNodeProps.Cells[1, Ord(rowNamedChildCount)]:= IntToStr(ANode.NamedChildCount);
+  sgNodeProps.Cells[1, Ord(rowStartByte)]:= IntToStr(ANode.StartByte);
+  sgNodeProps.Cells[1, Ord(rowStartPoint)]:= ANode.StartPoint.ToString;
+  sgNodeProps.Cells[1, Ord(rowEndByte)]:= IntToStr(ANode.EndByte);
+  sgNodeProps.Cells[1, Ord(rowEndPoint)]:= ANode.EndPoint.ToString;
+end;
+
+procedure TDTSMain.FormCreate(Sender: TObject);
+var
+  row: TSGNodePropRow;
+begin
+  //initialize property grid captions
+  sgNodeProps.RowCount:= Ord(High(TSGNodePropRow)) - Ord(Low(TSGNodePropRow)) + 1;
+  for row:= Low(TSGNodePropRow) to High(TSGNodePropRow) do
+    sgNodeProps.Cells[0, Ord(row)]:= sgNodePropCaptions[row];
+
   FParser:= TTSParser.Create;
   cbCode.ItemIndex:= 0;
   cbCodeChange(nil);
@@ -124,8 +175,14 @@ var
   memSel: TSelection;
 begin
   if Node = nil then
+  begin
+    ClearNodeProps;
     Exit;
+  end;
   tsSelected:= TTSTreeViewNode(Node).TSNode;
+  FillNodeProps(tsSelected);
+
+  //select the corresponding code in the memo
   ptStart:= tsSelected.StartPoint;
   ptEnd:= tsSelected.EndPoint;
 
