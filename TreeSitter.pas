@@ -295,7 +295,7 @@ end;
 
 function TTSPointHelper.ToString: string;
 begin
-  Result:= Format('(%d, %d)', [column, row]);
+  Result:= Format('(%d, %d)', [row, column]);
 end;
 
 { memory management functions }
