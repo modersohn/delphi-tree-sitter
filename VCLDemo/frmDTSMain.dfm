@@ -75,6 +75,7 @@ object DTSMain: TDTSMain
       Items.Strings = (
         'c'
         'cpp'
+        'pascal'
         'proto')
     end
   end
