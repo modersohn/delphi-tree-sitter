@@ -9,6 +9,9 @@
 
 *)
 
+//enforce Quad Word alignment in records
+{$A8}
+
 interface
 
 const
@@ -59,7 +62,7 @@ type
   TSSymbolType = (TSSymbolTypeRegular, TSSymbolTypeAnonymous,
     TSSymbolTypeAuxiliary);
 
-  TSPoint = packed record
+  TSPoint = record
     row: UInt32;
     column: UInt32;
   end;
@@ -93,7 +96,7 @@ typedef struct TSInputEdit {
 } TSInputEdit;
 *)
   type
-    TSNode = packed record
+    TSNode = record
       context: array[1..4] of UInt32;
       id: Pointer;
       tree: PTSTree;
