@@ -304,7 +304,9 @@ function ts_parser_parse_string_encoding(
  * and instead intend to use this parser to parse some other document, you must
  * call [`ts_parser_reset`] first.
  */
-void ts_parser_reset(TSParser *self);
+*)
+procedure ts_parser_reset(self: PTSParser); cdecl; external ModuleName;
+(*
 /**
  * Set the maximum duration in microseconds that parsing should be allowed to
  * take before halting.

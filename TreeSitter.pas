@@ -25,6 +25,8 @@ type
     constructor Create; virtual;
     destructor Destroy; override;
 
+    procedure Reset;
+
     function ParseString(const AString: string; const OldTree: TTSTree = nil): TTSTree;
 
     property Parser: PTSParser read FParser;
@@ -119,6 +121,11 @@ begin
   if tree = nil then
     raise ETreeSitterException.Create('Faild to parse string');
   Result:= TTSTree.Create(tree);
+end;
+
+procedure TTSParser.Reset;
+begin
+  ts_parser_reset(FParser);
 end;
 
 procedure TTSParser.SetLanguage(const Value: PTSLanguage);

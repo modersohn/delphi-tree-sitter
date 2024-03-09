@@ -129,6 +129,8 @@ begin
   if pAPI = nil then
     raise Exception.CreateFmt('The library "%s" does not provide a method "%s"',
       [tsLibName, tsAPIName]);
+  FParser.Reset;
+  FreeAndNil(FTree);
   FParser.Language:= pAPI;
 end;
 
