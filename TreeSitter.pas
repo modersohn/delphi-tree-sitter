@@ -172,8 +172,11 @@ end;
 
 function TTSNodeHelper.EndPoint: TTSPoint;
 begin
-  Result:= Default(TTSPoint);
+{$IFDEF WIN32}
+  Result:= TTSPoint(ts_node_end_point(Self));
+{$ELSE}
   Result:= ts_node_end_point(Self);
+{$ENDIF}
 end;
 
 class operator TTSNodeHelper.Equal(A, B: TTSNode): Boolean;
@@ -273,8 +276,11 @@ end;
 
 function TTSNodeHelper.StartPoint: TTSPoint;
 begin
-  Result:= Default(TTSPoint);
+{$IFDEF WIN32}
+  Result:= TTSPoint(ts_node_start_point(Self));
+{$ELSE}
   Result:= ts_node_start_point(Self);
+{$ENDIF}
 end;
 
 function TTSNodeHelper.Symbol: TSSymbol;

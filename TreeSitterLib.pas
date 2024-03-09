@@ -468,7 +468,14 @@ function ts_node_start_byte(self: TSNode): UInt32; cdecl; external ModuleName;
  * Get the node's start position in terms of rows and columns.
  */
 *)
+{$IFDEF WIN32}
+//the returned struct TSPoint is 8-byte in size and should be returned in EDX:EAX
+//which Delphi does only for Int64 according to the Language Guide
+//https://stackoverflow.com/a/16119171/386473
+function ts_node_start_point(self: TSNode): Int64; external ModuleName;
+{$ELSE}
 function ts_node_start_point(self: TSNode): TSPoint; cdecl; external ModuleName;
+{$ENDIF}
 (*
 /**
  * Get the node's end byte.
@@ -480,7 +487,14 @@ function ts_node_end_byte(self: TSNode): UInt32; cdecl; external ModuleName;
  * Get the node's end position in terms of rows and columns.
  */
 *)
+{$IFDEF WIN32}
+//the returned struct TSPoint is 8-byte in size and should be returned in EDX:EAX
+//which Delphi does only for Int64 according to the Language Guide
+//https://stackoverflow.com/a/16119171/386473
+function ts_node_end_point(self: TSNode): Int64; cdecl; external ModuleName;
+{$ELSE}
 function ts_node_end_point(self: TSNode): TSPoint; cdecl; external ModuleName;
+{$ENDIF}
 (*
 /**
  * Get an S-expression representing the node as a string.
