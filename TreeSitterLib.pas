@@ -474,7 +474,7 @@ function ts_node_start_byte(self: TSNode): UInt32; cdecl; external ModuleName;
 //the returned struct TSPoint is 8-byte in size and should be returned in EDX:EAX
 //which Delphi does only for Int64 according to the Language Guide
 //https://stackoverflow.com/a/16119171/386473
-function ts_node_start_point(self: TSNode): Int64; external ModuleName;
+function ts_node_start_point(self: TSNode): Int64; cdecl; external ModuleName;
 {$ELSE}
 function ts_node_start_point(self: TSNode): TSPoint; cdecl; external ModuleName;
 {$ENDIF}
