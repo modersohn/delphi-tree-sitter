@@ -135,6 +135,7 @@ end;
 procedure TDTSMain.cbCodeChange(Sender: TObject);
 begin
   LoadLanguageParser(cbCode.Items[cbCode.ItemIndex]);
+  ParseContent;
 end;
 
 procedure TDTSMain.ClearNodeProps;
@@ -195,11 +196,15 @@ var
   oldTree: TTSTree;
   root: TTSNode;
   rootNode: TTSTreeViewNode;
+  sCode: string;
 begin
-  oldTree:= FTree;
-  FTree:= FParser.ParseString(memCode.Lines.Text, oldTree);
-  oldTree.Free;
   treeView.Items.Clear;
+  sCode:= memCode.Lines.Text;
+  if Length(sCode) = 0 then
+    Exit; //avoid our own exception that empty string cannot be parsed
+  oldTree:= FTree;
+  FTree:= FParser.ParseString(sCode, oldTree);
+  oldTree.Free;
   root:= FTree.RootNode;
   rootNode:= TTSTreeViewNode(treeView.Items.AddChild(nil, root.NodeType));
   rootNode.SetupTSNode(root);
