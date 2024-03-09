@@ -242,6 +242,7 @@ var
   tsSelected: TTSNode;
   ptStart, ptEnd: TTSPoint;
   memSel: TSelection;
+  line: LRESULT;
 begin
   if Node = nil then
   begin
@@ -255,10 +256,18 @@ begin
   ptStart:= tsSelected.StartPoint;
   ptEnd:= tsSelected.EndPoint;
 
+  line:= memcode.Perform(EM_LineIndex, ptStart.row, 0);
+  if line < 0 then
+    Exit; //something's not right
+
   //TSPoint.Column is in bytes, we use UTF16, so divide by 2 to get character,
   //which is a simplification not necessarily true
-  memSel.StartPos:= memcode.Perform(EM_LineIndex, ptStart.row, 0) + ptStart.column div 2;
-  memSel.EndPos:= memcode.Perform(EM_LineIndex, ptEnd.row, 0) + ptEnd.column div 2;
+  memSel.StartPos:= line + Integer(ptStart.column) div 2;
+
+  line:= memcode.Perform(EM_LineIndex, ptEnd.row, 0);
+  if line < 0 then
+    Exit; //something's not right
+  memSel.EndPos:= line + Integer(ptEnd.column) div 2;
 
   SendMessage(memCode.Handle, EM_SETSEL, memSel.StartPos, memSel.EndPos);
   SendMessage(memCode.Handle, EM_SCROLLCARET, 0, 0);
