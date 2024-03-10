@@ -31,6 +31,17 @@ type
     Label1: TLabel;
     btnGetChildByField: TButton;
     actGetChildByField: TAction;
+    actShowNodeAsString: TAction;
+    mnuactShowNodeAsString: TMenuItem;
+    N1: TMenuItem;
+    actGotoFirstChild: TAction;
+    actGotoNextSibling: TAction;
+    actGotoPrevSibling: TAction;
+    mnuactGotoFirstChild: TMenuItem;
+    mnuactGotoNextSibling: TMenuItem;
+    mnuactGotoPrevSibling: TMenuItem;
+    N2: TMenuItem;
+    N3: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure memCodeExit(Sender: TObject);
@@ -48,6 +59,14 @@ type
     procedure actGotoExecute(Sender: TObject);
     procedure actGetChildByFieldExecute(Sender: TObject);
     procedure actGetChildByFieldUpdate(Sender: TObject);
+    procedure actShowNodeAsStringUpdate(Sender: TObject);
+    procedure actShowNodeAsStringExecute(Sender: TObject);
+    procedure actGotoFirstChildExecute(Sender: TObject);
+    procedure actGotoFirstChildUpdate(Sender: TObject);
+    procedure actGotoNextSiblingExecute(Sender: TObject);
+    procedure actGotoNextSiblingUpdate(Sender: TObject);
+    procedure actGotoPrevSiblingExecute(Sender: TObject);
+    procedure actGotoPrevSiblingUpdate(Sender: TObject);
   private
     FParser: TTSParser;
     FTree: TTSTree;
@@ -94,8 +113,8 @@ procedure TDTSMain.actGetChildByFieldExecute(Sender: TObject);
 var
   foundNode: TTSNode;
 begin
-  foundNode:= TTSTreeViewNode(treeView.Selected).TSNode.ChildByField(cbFields.ItemIndex + 1);
-  //foundNode:= TTSTreeViewNode(treeView.Selected).TSNode.ChildByField(cbFields.Text);
+  foundNode:= SelectedTSNode.ChildByField(cbFields.ItemIndex + 1);
+  //foundNode:= SelectedTSNode.ChildByField(cbFields.Text);
   if foundNode.IsNull then
     MessageDlg(Format('No child for field "%s" (%d) found', [cbFields.Text, cbFields.ItemIndex]),
       TMsgDlgType.mtError, [TMsgDlgBtn.mbOK], 0) else
@@ -104,13 +123,33 @@ end;
 
 procedure TDTSMain.actGetChildByFieldUpdate(Sender: TObject);
 begin
-  actGetChildByField.Enabled:= (treeView.Selected is TTSTreeViewNode) and
+  actGetChildByField.Enabled:= (not SelectedTSNode.IsNull) and
     (cbFields.ItemIndex >= 0);
 end;
 
 procedure TDTSMain.actGotoExecute(Sender: TObject);
 begin
   //to keep it enabled
+end;
+
+procedure TDTSMain.actGotoFirstChildExecute(Sender: TObject);
+begin
+  SelectedTSNode:= SelectedTSNode.NamedChild(0);
+end;
+
+procedure TDTSMain.actGotoFirstChildUpdate(Sender: TObject);
+begin
+  actGotoFirstChild.Enabled:= SelectedTSNode.NamedChildCount > 0;
+end;
+
+procedure TDTSMain.actGotoNextSiblingExecute(Sender: TObject);
+begin
+  SelectedTSNode:= SelectedTSNode.NextNamedSibling;
+end;
+
+procedure TDTSMain.actGotoNextSiblingUpdate(Sender: TObject);
+begin
+  actGotoNextSibling.Enabled:= not SelectedTSNode.NextNamedSibling.IsNull;
 end;
 
 procedure TDTSMain.actGotoParentExecute(Sender: TObject);
@@ -123,9 +162,29 @@ begin
   actGotoParent.Enabled:= not SelectedTSNode.Parent.IsNull;
 end;
 
+procedure TDTSMain.actGotoPrevSiblingExecute(Sender: TObject);
+begin
+  SelectedTSNode:= SelectedTSNode.PrevNamedSibling;
+end;
+
+procedure TDTSMain.actGotoPrevSiblingUpdate(Sender: TObject);
+begin
+  actGotoPrevSibling.Enabled:= not SelectedTSNode.PrevNamedSibling.IsNull;
+end;
+
 procedure TDTSMain.actGotoUpdate(Sender: TObject);
 begin
   actGoto.Enabled:= not SelectedTSNode.IsNull;
+end;
+
+procedure TDTSMain.actShowNodeAsStringExecute(Sender: TObject);
+begin
+  ShowMessage(SelectedTSNode.ToString);
+end;
+
+procedure TDTSMain.actShowNodeAsStringUpdate(Sender: TObject);
+begin
+  actShowNodeAsString.Enabled:= not SelectedTSNode.IsNull;
 end;
 
 procedure TDTSMain.btnLoadClick(Sender: TObject);

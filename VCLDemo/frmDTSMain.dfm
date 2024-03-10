@@ -185,6 +185,29 @@ object DTSMain: TDTSMain
       OnExecute = actGetChildByFieldExecute
       OnUpdate = actGetChildByFieldUpdate
     end
+    object actShowNodeAsString: TAction
+      Caption = 'Show S-expression...'
+      OnExecute = actShowNodeAsStringExecute
+      OnUpdate = actShowNodeAsStringUpdate
+    end
+    object actGotoFirstChild: TAction
+      Category = 'Goto'
+      Caption = 'First child'
+      OnExecute = actGotoFirstChildExecute
+      OnUpdate = actGotoFirstChildUpdate
+    end
+    object actGotoNextSibling: TAction
+      Category = 'Goto'
+      Caption = 'Next sibling'
+      OnExecute = actGotoNextSiblingExecute
+      OnUpdate = actGotoNextSiblingUpdate
+    end
+    object actGotoPrevSibling: TAction
+      Category = 'Goto'
+      Caption = 'Previous sibling'
+      OnExecute = actGotoPrevSiblingExecute
+      OnUpdate = actGotoPrevSiblingUpdate
+    end
   end
   object pmTree: TPopupMenu
     Left = 416
@@ -194,6 +217,27 @@ object DTSMain: TDTSMain
       object mnuactGotoParent: TMenuItem
         Action = actGotoParent
       end
+      object N2: TMenuItem
+        Caption = '-'
+      end
+      object mnuactGotoFirstChild: TMenuItem
+        Action = actGotoFirstChild
+      end
+      object N3: TMenuItem
+        Caption = '-'
+      end
+      object mnuactGotoNextSibling: TMenuItem
+        Action = actGotoNextSibling
+      end
+      object mnuactGotoPrevSibling: TMenuItem
+        Action = actGotoPrevSibling
+      end
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object mnuactShowNodeAsString: TMenuItem
+      Action = actShowNodeAsString
     end
   end
 end
