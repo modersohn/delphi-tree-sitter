@@ -195,7 +195,6 @@ end;
 
 procedure TDTSMain.ParseContent;
 var
-  oldTree: TTSTree;
   root: TTSNode;
   rootNode: TTSTreeViewNode;
   sCode: string;
@@ -204,9 +203,10 @@ begin
   sCode:= memCode.Lines.Text;
   if Length(sCode) = 0 then
     Exit; //avoid our own exception that empty string cannot be parsed
-  oldTree:= FTree;
-  FTree:= FParser.ParseString(sCode, oldTree);
-  oldTree.Free;
+  //we no longer pass OldTree as we would need to track editing and call
+  //ts_tree_edit
+  FreeAndNil(FTree);
+  FTree:= FParser.ParseString(sCode);
   root:= FTree.RootNode;
   rootNode:= TTSTreeViewNode(treeView.Items.AddChild(nil, root.NodeType));
   rootNode.SetupTSNode(root);
