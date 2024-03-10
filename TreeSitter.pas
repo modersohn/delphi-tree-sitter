@@ -10,6 +10,17 @@ type
   PTSGetLanguageFunc = ^TTSGetLanguageFunc;
   TTSGetLanguageFunc = function(): PTSLanguage; cdecl;
 
+  TSLanguageHelper = record helper for TSLanguage
+  private
+    function GetFieldName(AFieldId: TSFieldId): string;
+    function GetFieldId(const AFieldName: string): TSFieldId;
+  public
+    function FieldCount: UInt32;
+
+    property FieldName[AFieldId: TSFieldId]: string read GetFieldName;
+    property FieldId[const AFieldName: string]: TSFieldId read GetFieldId;
+  end;
+
   ETreeSitterException = Exception;
 
   TTSTree = class;
@@ -76,6 +87,9 @@ type
     function StartPoint: TTSPoint;
     function EndByte: UInt32;
     function EndPoint: TTSPoint;
+
+    function ChildByField(const AFieldName: string): TTSNode; overload;
+    function ChildByField(const AFieldId: UInt32): TTSNode; overload;
 
     class operator Equal(A: TTSNode; B: TTSNode): Boolean;
   end;
@@ -165,6 +179,19 @@ end;
 function TTSNodeHelper.Child(AIndex: Integer): TTSNode;
 begin
   Result:= ts_node_child(Self, AIndex);
+end;
+
+function TTSNodeHelper.ChildByField(const AFieldId: UInt32): TTSNode;
+begin
+  Result:= ts_node_child_by_field_id(Self, AFieldId);
+end;
+
+function TTSNodeHelper.ChildByField(const AFieldName: string): TTSNode;
+var
+  ansiFieldName: AnsiString;
+begin
+  ansiFieldName:= AnsiString(AFieldName);
+  Result:= ts_node_child_by_field_name(Self, PAnsiChar(ansiFieldName), Length(ansiFieldName));
 end;
 
 function TTSNodeHelper.ChildCount: Integer;
@@ -333,6 +360,26 @@ function ts_realloc_func(ptr: Pointer; sizeOf: NativeUInt): Pointer; cdecl;
 begin
   Result:= ptr;
   ReallocMem(Result, sizeOf);
+end;
+
+{ TSLanguageHelper }
+
+function TSLanguageHelper.FieldCount: UInt32;
+begin
+  Result:= ts_language_field_count(@Self);
+end;
+
+function TSLanguageHelper.GetFieldId(const AFieldName: string): TSFieldId;
+var
+  ansiFieldName: AnsiString;
+begin
+  ansiFieldName:= AnsiString(AFieldName);
+  Result:= ts_language_field_id_for_name(@Self, PAnsiChar(ansiFieldName), Length(ansiFieldName));
+end;
+
+function TSLanguageHelper.GetFieldName(AFieldId: TSFieldId): string;
+begin
+  Result:= string(AnsiString(ts_language_field_name_for_id(@Self, AFieldId)));
 end;
 
 initialization

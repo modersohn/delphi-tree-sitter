@@ -27,6 +27,10 @@ type
     pmTree: TPopupMenu;
     mnuactGoto: TMenuItem;
     mnuactGotoParent: TMenuItem;
+    cbFields: TComboBox;
+    Label1: TLabel;
+    btnGetChildByField: TButton;
+    actGetChildByField: TAction;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure memCodeExit(Sender: TObject);
@@ -42,12 +46,15 @@ type
     procedure actGotoParentExecute(Sender: TObject);
     procedure actGotoParentUpdate(Sender: TObject);
     procedure actGotoExecute(Sender: TObject);
+    procedure actGetChildByFieldExecute(Sender: TObject);
+    procedure actGetChildByFieldUpdate(Sender: TObject);
   private
     FParser: TTSParser;
     FTree: TTSTree;
     FEditChanged: Boolean;
     procedure ParseContent;
     procedure LoadLanguageParser(const ALangBaseName: string);
+    procedure LoadLanguageFields;
     procedure FillNodeProps(const ANode: TTSNode);
     procedure ClearNodeProps;
     function GetSelectedTSNode: TTSNode;
@@ -67,6 +74,9 @@ var
 
 implementation
 
+uses
+  UITypes;
+
 {$R *.dfm}
 
 type
@@ -79,6 +89,24 @@ const
     'Symbol', 'GrammarType', 'GrammarSymbol', 'IsError',
     'HasError', 'IsExtra', 'IsMissing', 'IsNamed', 'ChildCount',
     'NamedChildCount', 'StartByte', 'StartPoint', 'EndByte', 'EndPoint');
+
+procedure TDTSMain.actGetChildByFieldExecute(Sender: TObject);
+var
+  foundNode: TTSNode;
+begin
+  foundNode:= TTSTreeViewNode(treeView.Selected).TSNode.ChildByField(cbFields.ItemIndex + 1);
+  //foundNode:= TTSTreeViewNode(treeView.Selected).TSNode.ChildByField(cbFields.Text);
+  if foundNode.IsNull then
+    MessageDlg(Format('No child for field "%s" (%d) found', [cbFields.Text, cbFields.ItemIndex]),
+      TMsgDlgType.mtError, [TMsgDlgBtn.mbOK], 0) else
+    SelectedTSNode:= foundNode;
+end;
+
+procedure TDTSMain.actGetChildByFieldUpdate(Sender: TObject);
+begin
+  actGetChildByField.Enabled:= (treeView.Selected is TTSTreeViewNode) and
+    (cbFields.ItemIndex >= 0);
+end;
 
 procedure TDTSMain.actGotoExecute(Sender: TObject);
 begin
@@ -132,6 +160,23 @@ begin
   FParser.Reset;
   FreeAndNil(FTree);
   FParser.Language:= pAPI;
+  LoadLanguageFields;
+end;
+
+procedure TDTSMain.LoadLanguageFields;
+var
+  i: UInt32;
+begin
+  cbFields.Items.BeginUpdate;
+  try
+    cbFields.Items.Clear;
+    if FParser.Language = nil then
+      Exit;
+    for i:= 1 to FParser.Language^.FieldCount do
+      cbFields.Items.AddObject(FParser.Language^.FieldName[i], TObject(i));
+  finally
+    cbFields.Items.EndUpdate;
+  end;
 end;
 
 procedure TDTSMain.cbCodeChange(Sender: TObject);

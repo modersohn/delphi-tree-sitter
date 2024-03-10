@@ -55,6 +55,14 @@ object DTSMain: TDTSMain
       Height = 15
       Caption = 'Code:'
     end
+    object Label1: TLabel
+      Left = 411
+      Top = 17
+      Width = 86
+      Height = 15
+      Anchors = [akTop, akRight]
+      Caption = 'Language fields:'
+    end
     object btnLoad: TButton
       Left = 8
       Top = 13
@@ -77,6 +85,24 @@ object DTSMain: TDTSMain
         'cpp'
         'pascal'
         'proto')
+    end
+    object cbFields: TComboBox
+      Left = 507
+      Top = 14
+      Width = 145
+      Height = 23
+      Style = csDropDownList
+      Anchors = [akTop, akRight]
+      TabOrder = 2
+    end
+    object btnGetChildByField: TButton
+      Left = 658
+      Top = 13
+      Width = 97
+      Height = 25
+      Action = actGetChildByField
+      Anchors = [akTop, akRight]
+      TabOrder = 3
     end
   end
   object Panel1: TPanel
@@ -143,14 +169,21 @@ object DTSMain: TDTSMain
     Left = 344
     Top = 336
     object actGoto: TAction
+      Category = 'Goto'
       Caption = 'Go to'
       OnExecute = actGotoExecute
       OnUpdate = actGotoUpdate
     end
     object actGotoParent: TAction
+      Category = 'Goto'
       Caption = 'Parent'
       OnExecute = actGotoParentExecute
       OnUpdate = actGotoParentUpdate
+    end
+    object actGetChildByField: TAction
+      Caption = 'Child by fieldID'
+      OnExecute = actGetChildByFieldExecute
+      OnUpdate = actGetChildByFieldUpdate
     end
   end
   object pmTree: TPopupMenu

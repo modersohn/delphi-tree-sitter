@@ -610,19 +610,21 @@ function ts_node_named_child_count(self: TSNode): UInt32; cdecl; external Module
 /**
  * Get the node's child with the given field name.
  */
-TSNode ts_node_child_by_field_name(
-  TSNode self,
-  const char *name,
-  uint32_t name_length
-);
+*)
+function ts_node_child_by_field_name(
+  self: TSNode;
+  const name: PAnsiChar;
+  name_length: UInt32
+): TSNode; cdecl; external ModuleName;
+(*
 /**
  * Get the node's child with the given numerical field id.
  *
  * You can convert a field name to an id using the
  * [`ts_language_field_id_for_name`] function.
  */
-TSNode ts_node_child_by_field_id(TSNode self, TSFieldId field_id);
 *)
+function ts_node_child_by_field_id(self: TSNode; field_id: TSFieldId): TSNode; cdecl; external ModuleName;
 (*
 /**
  * Get the node's next / previous sibling.
@@ -1031,15 +1033,21 @@ TSSymbol ts_language_symbol_for_name(
 /**
  * Get the number of distinct field names in the language.
  */
-uint32_t ts_language_field_count(const TSLanguage *self);
+*)
+function ts_language_field_count(const Self: PTSLanguage): UInt32; cdecl; external ModuleName;
+(*
 /**
  * Get the field name string for the given numerical id.
  */
-const char *ts_language_field_name_for_id(const TSLanguage *self, TSFieldId id);
+*)
+function ts_language_field_name_for_id(const Self: PTSLanguage; id: TSFieldId): PAnsiChar; cdecl; external ModuleName;
+(*
 /**
  * Get the numerical id for the given field name string.
  */
-TSFieldId ts_language_field_id_for_name(const TSLanguage *self, const char *name, uint32_t name_length);
+*)
+function ts_language_field_id_for_name(const Self: PTSLanguage; const name: PAnsiChar; name_length: UInt32): TSFieldId; cdecl; external ModuleName;
+(*
 /**
  * Check whether the given node type id belongs to named nodes, anonymous nodes,
  * or a hidden nodes.
