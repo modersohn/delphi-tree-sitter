@@ -95,12 +95,11 @@ typedef struct TSInputEdit {
   TSPoint new_end_point;
 } TSInputEdit;
 *)
-  type
-    TSNode = record
-      context: array[1..4] of UInt32;
-      id: Pointer;
-      tree: PTSTree;
-    end;
+  TSNode = record
+    context: array[1..4] of UInt32;
+    id: Pointer;
+    tree: PTSTree;
+  end;
 (*
 typedef struct TSTreeCursor {
   const void *tree;
@@ -648,10 +647,14 @@ TSNode ts_node_first_child_for_byte(TSNode self, uint32_t byte);
  * Get the node's first named child that extends beyond the given byte offset.
  */
 TSNode ts_node_first_named_child_for_byte(TSNode self, uint32_t byte);
+*)
+(*
 /**
  * Get the node's number of descendants, including one for the node itself.
  */
-uint32_t ts_node_descendant_count(TSNode self);
+*)
+function ts_node_descendant_count(self: TSNode): UInt32; cdecl; external ModuleName;
+(*
 /**
  * Get the smallest node within this node that spans the given range of bytes
  * or (row, column) positions.

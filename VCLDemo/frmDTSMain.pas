@@ -101,13 +101,15 @@ uses
 type
   TSGNodePropRow = (rowSymbol, rowGrammarType, rowGrammarSymbol, rowIsError,
     rowHasError, rowIsExtra, rowIsMissing, rowIsNamed, rowChildCount,
-    rowNamedChildCount, rowStartByte, rowStartPoint, rowEndByte, rowEndPoint);
+    rowNamedChildCount, rowStartByte, rowStartPoint, rowEndByte, rowEndPoint,
+    rowDescendantCount);
 
 const
   sgNodePropCaptions: array[TSGNodePropRow] of string = (
     'Symbol', 'GrammarType', 'GrammarSymbol', 'IsError',
     'HasError', 'IsExtra', 'IsMissing', 'IsNamed', 'ChildCount',
-    'NamedChildCount', 'StartByte', 'StartPoint', 'EndByte', 'EndPoint');
+    'NamedChildCount', 'StartByte', 'StartPoint', 'EndByte', 'EndPoint',
+    'DescendantCount');
 
 procedure TDTSMain.actGetChildByFieldExecute(Sender: TObject);
 var
@@ -268,6 +270,7 @@ begin
   sgNodeProps.Cells[1, Ord(rowStartPoint)]:= ANode.StartPoint.ToString;
   sgNodeProps.Cells[1, Ord(rowEndByte)]:= IntToStr(ANode.EndByte);
   sgNodeProps.Cells[1, Ord(rowEndPoint)]:= ANode.EndPoint.ToString;
+  sgNodeProps.Cells[1, Ord(rowDescendantCount)]:= IntToStr(ANode.DescendantCount);
 end;
 
 procedure TDTSMain.FormCreate(Sender: TObject);

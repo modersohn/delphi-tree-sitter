@@ -91,6 +91,8 @@ type
     function ChildByField(const AFieldName: string): TTSNode; overload;
     function ChildByField(const AFieldId: UInt32): TTSNode; overload;
 
+    function DescendantCount: UInt32;
+
     class operator Equal(A: TTSNode; B: TTSNode): Boolean;
   end;
 
@@ -197,6 +199,11 @@ end;
 function TTSNodeHelper.ChildCount: Integer;
 begin
   Result:= ts_node_child_count(Self);
+end;
+
+function TTSNodeHelper.DescendantCount: UInt32;
+begin
+  Result:= ts_node_descendant_count(Self);
 end;
 
 function TTSNodeHelper.EndByte: UInt32;
@@ -338,6 +345,26 @@ begin
   Result:= Format('(%d, %d)', [row, column]);
 end;
 
+{ TSLanguageHelper }
+
+function TSLanguageHelper.FieldCount: UInt32;
+begin
+  Result:= ts_language_field_count(@Self);
+end;
+
+function TSLanguageHelper.GetFieldId(const AFieldName: string): TSFieldId;
+var
+  ansiFieldName: AnsiString;
+begin
+  ansiFieldName:= AnsiString(AFieldName);
+  Result:= ts_language_field_id_for_name(@Self, PAnsiChar(ansiFieldName), Length(ansiFieldName));
+end;
+
+function TSLanguageHelper.GetFieldName(AFieldId: TSFieldId): string;
+begin
+  Result:= string(AnsiString(ts_language_field_name_for_id(@Self, AFieldId)));
+end;
+
 { memory management functions }
 
 function ts_malloc_func(sizeOf: NativeUInt): Pointer; cdecl;
@@ -360,26 +387,6 @@ function ts_realloc_func(ptr: Pointer; sizeOf: NativeUInt): Pointer; cdecl;
 begin
   Result:= ptr;
   ReallocMem(Result, sizeOf);
-end;
-
-{ TSLanguageHelper }
-
-function TSLanguageHelper.FieldCount: UInt32;
-begin
-  Result:= ts_language_field_count(@Self);
-end;
-
-function TSLanguageHelper.GetFieldId(const AFieldName: string): TSFieldId;
-var
-  ansiFieldName: AnsiString;
-begin
-  ansiFieldName:= AnsiString(AFieldName);
-  Result:= ts_language_field_id_for_name(@Self, PAnsiChar(ansiFieldName), Length(ansiFieldName));
-end;
-
-function TSLanguageHelper.GetFieldName(AFieldId: TSFieldId): string;
-begin
-  Result:= string(AnsiString(ts_language_field_name_for_id(@Self, AFieldId)));
 end;
 
 initialization
