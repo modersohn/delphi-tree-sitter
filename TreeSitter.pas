@@ -57,6 +57,40 @@ type
     property Tree: PTSTree read FTree;
   end;
 
+  TTSTreeCursor = class
+  strict private
+    FTreeCursor: TSTreeCursor;
+    function GetTreeCursor: PTSTreeCursor;
+    function GetCurrentNode: TTSNode;
+    function GetCurrentFieldName: string;
+    function GetCurrentFieldId: TSFieldId;
+    function GetCurrentDepth: UInt32;
+    function GetCurrentDescendantIndex: UInt32;
+  public
+    constructor Create(ANode: TTSNode); overload; virtual;
+    constructor Create(ACursorToCopy: TTSTreeCursor); overload; virtual;
+    destructor Destroy; override;
+
+    procedure Reset(ANode: TTSNode); overload;
+    procedure Reset(ACursor: TTSTreeCursor); overload;
+
+    function GotoParent: Boolean;
+    function GotoNextSibling: Boolean;
+    function GotoPrevSibling: Boolean;
+    function GotoFirstChild: Boolean;
+    function GotoLastChild: Boolean;
+    procedure GotoDescendant(AGoalDescendantIndex: UInt32);
+    function GotoFirstChildForGoal(AGoalByte: UInt32): Int64; overload;
+    function GotoFirstChildForGoal(AGoalPoint: TTSPoint): Int64; overload;
+
+    property TreeCursor: PTSTreeCursor read GetTreeCursor;
+    property CurrentNode: TTSNode read GetCurrentNode;
+    property CurrentFieldName: string read GetCurrentFieldName;
+    property CurrentFieldId: TSFieldId read GetCurrentFieldId;
+    property CurrentDescendantIndex: UInt32 read GetCurrentDescendantIndex;
+    property CurrentDepth: UInt32 read GetCurrentDepth;
+  end;
+
   TTSNodeHelper = record helper for TTSNode
     function NodeType: string;
     function Symbol: TSSymbol;
@@ -363,6 +397,105 @@ end;
 function TSLanguageHelper.GetFieldName(AFieldId: TSFieldId): string;
 begin
   Result:= string(AnsiString(ts_language_field_name_for_id(@Self, AFieldId)));
+end;
+
+{ TTSTreeCursor }
+
+constructor TTSTreeCursor.Create(ANode: TTSNode);
+begin
+  FTreeCursor:= ts_tree_cursor_new(ANode);
+end;
+
+constructor TTSTreeCursor.Create(ACursorToCopy: TTSTreeCursor);
+begin
+  FTreeCursor:= ts_tree_cursor_copy(ACursorToCopy.TreeCursor);
+end;
+
+destructor TTSTreeCursor.Destroy;
+begin
+  ts_tree_cursor_delete(@FTreeCursor);
+  FillChar(FTreeCursor, SizeOf(FTreeCursor), 0);
+  inherited;
+end;
+
+function TTSTreeCursor.GetCurrentDepth: UInt32;
+begin
+  Result:= ts_tree_cursor_current_depth(@FTreeCursor);
+end;
+
+function TTSTreeCursor.GetCurrentDescendantIndex: UInt32;
+begin
+  Result:= ts_tree_cursor_current_descendant_index(@FTreeCursor);
+end;
+
+function TTSTreeCursor.GetCurrentFieldId: TSFieldId;
+begin
+  Result:= ts_tree_cursor_current_field_id(@FTreeCursor);
+end;
+
+function TTSTreeCursor.GetCurrentFieldName: string;
+begin
+  Result:= string(AnsiString(ts_tree_cursor_current_field_name(@FTreeCursor)));
+end;
+
+function TTSTreeCursor.GetCurrentNode: TTSNode;
+begin
+  Result:= ts_tree_cursor_current_node(@FTreeCursor);
+end;
+
+function TTSTreeCursor.GetTreeCursor: PTSTreeCursor;
+begin
+  Result:= @FTreeCursor;
+end;
+
+procedure TTSTreeCursor.GotoDescendant(AGoalDescendantIndex: UInt32);
+begin
+  ts_tree_cursor_goto_descendant(@FTreeCursor, AGoalDescendantIndex);
+end;
+
+function TTSTreeCursor.GotoFirstChild: Boolean;
+begin
+  Result:= ts_tree_cursor_goto_first_child(@FTreeCursor);
+end;
+
+function TTSTreeCursor.GotoFirstChildForGoal(AGoalPoint: TTSPoint): Int64;
+begin
+  Result:= ts_tree_cursor_goto_first_child_for_point(@FTreeCursor, AGoalPoint);
+end;
+
+function TTSTreeCursor.GotoFirstChildForGoal(AGoalByte: UInt32): Int64;
+begin
+  Result:= ts_tree_cursor_goto_first_child_for_byte(@FTreeCursor, AGoalByte);
+end;
+
+function TTSTreeCursor.GotoLastChild: Boolean;
+begin
+  Result:= ts_tree_cursor_goto_last_child(@FTreeCursor);
+end;
+
+function TTSTreeCursor.GotoNextSibling: Boolean;
+begin
+  Result:= ts_tree_cursor_goto_next_sibling(@FTreeCursor);
+end;
+
+function TTSTreeCursor.GotoParent: Boolean;
+begin
+  Result:= ts_tree_cursor_goto_parent(@FTreeCursor);
+end;
+
+function TTSTreeCursor.GotoPrevSibling: Boolean;
+begin
+  Result:= ts_tree_cursor_goto_previous_sibling(@FTreeCursor);
+end;
+
+procedure TTSTreeCursor.Reset(ACursor: TTSTreeCursor);
+begin
+  ts_tree_cursor_reset_to(@FTreeCursor, ACursor.TreeCursor);
+end;
+
+procedure TTSTreeCursor.Reset(ANode: TTSNode);
+begin
+  ts_tree_cursor_reset(@FTreeCursor, ANode);
 end;
 
 { memory management functions }

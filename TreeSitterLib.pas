@@ -100,12 +100,14 @@ typedef struct TSInputEdit {
     id: Pointer;
     tree: PTSTree;
   end;
+
+  PTSTreeCursor = ^TSTreeCursor;
+  TSTreeCursor = record
+    tree: PTSTree;
+    id: Pointer;
+    context: array[1..2] of UInt32;
+  end;
 (*
-typedef struct TSTreeCursor {
-  const void *tree;
-  const void *id;
-  uint32_t context[2];
-} TSTreeCursor;
 typedef struct TSQueryCapture {
   TSNode node;
   uint32_t index;
@@ -695,54 +697,72 @@ function ts_node_eq(self, other: TSNode): Boolean; cdecl; external ModuleName;
  * possible using the [`TSNode`] functions. It is a mutable object that is always
  * on a certain syntax node, and can be moved imperatively to different nodes.
  */
-TSTreeCursor ts_tree_cursor_new(TSNode node);
+*)
+function ts_tree_cursor_new(node: TSNode): TSTreeCursor; cdecl; external ModuleName;
+(*
 /**
  * Delete a tree cursor, freeing all of the memory that it used.
  */
-void ts_tree_cursor_delete(TSTreeCursor *self);
+*)
+procedure ts_tree_cursor_delete(self: PTSTreeCursor); cdecl; external ModuleName;
+(*
 /**
  * Re-initialize a tree cursor to start at a different node.
  */
-void ts_tree_cursor_reset(TSTreeCursor *self, TSNode node);
+*)
+procedure ts_tree_cursor_reset(Self: PTSTreeCursor; node: TSNode); cdecl; external ModuleName;
+(*
 /**
  * Re-initialize a tree cursor to the same position as another cursor.
  *
  * Unlike [`ts_tree_cursor_reset`], this will not lose parent information and
  * allows reusing already created cursors.
 */
-void ts_tree_cursor_reset_to(TSTreeCursor *dst, const TSTreeCursor *src);
+*)
+procedure ts_tree_cursor_reset_to(dst: PTSTreeCursor; const src: PTSTreeCursor); cdecl; external ModuleName;
+(*
 /**
  * Get the tree cursor's current node.
  */
-TSNode ts_tree_cursor_current_node(const TSTreeCursor *self);
+*)
+function ts_tree_cursor_current_node(const self: PTSTreeCursor): TSNode; cdecl; external ModuleName;
+(*
 /**
  * Get the field name of the tree cursor's current node.
  *
  * This returns `NULL` if the current node doesn't have a field.
  * See also [`ts_node_child_by_field_name`].
  */
-const char *ts_tree_cursor_current_field_name(const TSTreeCursor *self);
+*)
+function ts_tree_cursor_current_field_name(const self: PTSTreeCursor): PAnsiChar; cdecl; external ModuleName;
+(*
 /**
  * Get the field id of the tree cursor's current node.
  *
  * This returns zero if the current node doesn't have a field.
  * See also [`ts_node_child_by_field_id`], [`ts_language_field_id_for_name`].
  */
-TSFieldId ts_tree_cursor_current_field_id(const TSTreeCursor *self);
+*)
+function ts_tree_cursor_current_field_id(const self: PTSTreeCursor): TSFieldId; cdecl; external ModuleName;
+(*
 /**
  * Move the cursor to the parent of its current node.
  *
  * This returns `true` if the cursor successfully moved, and returns `false`
  * if there was no parent node (the cursor was already on the root node).
  */
-bool ts_tree_cursor_goto_parent(TSTreeCursor *self);
+*)
+function ts_tree_cursor_goto_parent(self: PTSTreeCursor): Boolean; cdecl; external ModuleName;
+(*
 /**
  * Move the cursor to the next sibling of its current node.
  *
  * This returns `true` if the cursor successfully moved, and returns `false`
  * if there was no next sibling node.
  */
-bool ts_tree_cursor_goto_next_sibling(TSTreeCursor *self);
+*)
+function ts_tree_cursor_goto_next_sibling(self: PTSTreeCursor): Boolean; cdecl; external ModuleName;
+(*
 /**
  * Move the cursor to the previous sibling of its current node.
  *
@@ -754,14 +774,18 @@ bool ts_tree_cursor_goto_next_sibling(TSTreeCursor *self);
  * the worst case, this will need to iterate through all the children upto the
  * previous sibling node to recalculate its position.
  */
-bool ts_tree_cursor_goto_previous_sibling(TSTreeCursor *self);
+*)
+function ts_tree_cursor_goto_previous_sibling(self: PTSTreeCursor): Boolean; cdecl; external ModuleName;
+(*
 /**
  * Move the cursor to the first child of its current node.
  *
  * This returns `true` if the cursor successfully moved, and returns `false`
  * if there were no children.
  */
-bool ts_tree_cursor_goto_first_child(TSTreeCursor *self);
+*)
+function ts_tree_cursor_goto_first_child(self: PTSTreeCursor): Boolean; cdecl; external ModuleName;
+(*
 /**
  * Move the cursor to the last child of its current node.
  *
@@ -772,23 +796,31 @@ bool ts_tree_cursor_goto_first_child(TSTreeCursor *self);
  * because it needs to iterate through all the children to compute the child's
  * position.
  */
-bool ts_tree_cursor_goto_last_child(TSTreeCursor *self);
+*)
+function ts_tree_cursor_goto_last_child(self: PTSTreeCursor): Boolean; cdecl; external ModuleName;
+(*
 /**
  * Move the cursor to the node that is the nth descendant of
  * the original node that the cursor was constructed with, where
  * zero represents the original node itself.
  */
-void ts_tree_cursor_goto_descendant(TSTreeCursor *self, uint32_t goal_descendant_index);
+*)
+procedure ts_tree_cursor_goto_descendant(self: PTSTreeCursor; goal_descendant_index: UInt32); cdecl; external ModuleName;
+(*
 /**
  * Get the index of the cursor's current node out of all of the
  * descendants of the original node that the cursor was constructed with.
  */
-uint32_t ts_tree_cursor_current_descendant_index(const TSTreeCursor *self);
+*)
+function ts_tree_cursor_current_descendant_index(const self: PTSTreeCursor): UInt32; cdecl; external ModuleName;
+(*
 /**
  * Get the depth of the cursor's current node relative to the original
  * node that the cursor was constructed with.
  */
-uint32_t ts_tree_cursor_current_depth(const TSTreeCursor *self);
+*)
+function ts_tree_cursor_current_depth(const self: PTSTreeCursor): UInt32; cdecl; external ModuleName;
+(*
 /**
  * Move the cursor to the first child of its current node that extends beyond
  * the given byte offset or point.
@@ -796,9 +828,12 @@ uint32_t ts_tree_cursor_current_depth(const TSTreeCursor *self);
  * This returns the index of the child node if one was found, and returns -1
  * if no such child was found.
  */
-int64_t ts_tree_cursor_goto_first_child_for_byte(TSTreeCursor *self, uint32_t goal_byte);
-int64_t ts_tree_cursor_goto_first_child_for_point(TSTreeCursor *self, TSPoint goal_point);
-TSTreeCursor ts_tree_cursor_copy(const TSTreeCursor *cursor);
+*)
+function ts_tree_cursor_goto_first_child_for_byte(self: PTSTreeCursor; goal_byte: UInt32): Int64; cdecl; external ModuleName;
+function ts_tree_cursor_goto_first_child_for_point(self: PTSTreeCursor; goal_point: TSPoint): Int64; cdecl; external ModuleName;
+
+function ts_tree_cursor_copy(const cursor: PTSTreeCursor): TSTreeCursor; cdecl; external ModuleName;
+(*
 /*******************/
 /* Section - Query */
 /*******************/

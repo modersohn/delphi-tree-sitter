@@ -395,19 +395,35 @@ end;
 
 procedure TDTSMain.treeViewExpanding(Sender: TObject; Node: TTreeNode;
   var AllowExpansion: Boolean);
+var
+  tsCursor: TTSTreeCursor;
+  tsNode: TTSNode;
+  newTreeNode: TTSTreeViewNode;
+  s: string;
 begin
   AllowExpansion:= True;
-  if Node.getFirstChild = nil then
-    if TTSTreeViewNode(Node).TSNode.NamedChildCount > 0 then
+  if Node.getFirstChild <> nil then
+    Exit;
+  tsCursor:= TTSTreeCursor.Create(TTSTreeViewNode(Node).TSNode);
+  try
+    if tsCursor.GotoFirstChild then
     begin
-      var child:= TTSTreeViewNode(Node).TSNode.NamedChild(0);
-      while not child.IsNull do
-      begin
-        var newNode:= treeView.Items.AddChild(Node, child.NodeType);
-        TTSTreeViewNode(newNode).SetupTSNode(child);
-        child:= child.NextNamedSibling;
-      end;
+      repeat
+        tsNode:= tsCursor.CurrentNode;
+        if not tsNode.IsNamed then
+          Continue;
+        if tsCursor.CurrentFieldId > 0 then
+          s:= Format('%s (%d): %s', [tsCursor.CurrentFieldName,
+            tsCursor.CurrentFieldId, tsNode.NodeType])
+        else
+          s:= tsNode.NodeType;
+        newTreeNode:= TTSTreeViewNode(treeView.Items.AddChild(Node, s));
+        newTreeNode.SetupTSNode(tsNode);
+      until not tsCursor.GotoNextSibling;
     end;
+  finally
+    tsCursor.Free;
+  end;
 end;
 
 procedure TDTSMain.memCodeChange(Sender: TObject);
