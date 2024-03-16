@@ -12,7 +12,7 @@ Windows only for now and only tested with Delphi.
 | API section | Status |
 | --- | --- |
 | Parser | Basics covered |
-| Language | Basics covered |
+| Language | Mostly complete |
 | Tree | Basics covered |
 | TreeCursor | Mostly complete |
 | Node | Mostly complete |
@@ -47,3 +47,6 @@ Most parsers do not seem to come with zig-support out of the box, but it should 
 Currently only supports a few languages and a treeview of named nodes with field name and ID where applicable. Selects the corresponding code part in the memo when a node gets selected.
 
 Inspector-like grid with node properties. Navigation via popup menu of the tree. Lists field names of the language and allows finding child node by field ID.
+
+Now with secondary form listing symbols, fields and version of the language:
+![image](https://github.com/modersohn/delphi-tree-sitter/assets/44807458/1243f2fe-ca26-4658-a24e-55ab11c5c153)
