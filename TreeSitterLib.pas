@@ -382,10 +382,14 @@ TSNode ts_tree_root_node_with_offset(
   uint32_t offset_bytes,
   TSPoint offset_extent
 );
+*)
+(*
 /**
  * Get the language that was used to parse the syntax tree.
  */
-const TSLanguage *ts_tree_language(const TSTree *self);
+*)
+function ts_tree_language(const self: PTSTree): PTSLanguage; cdecl; external ModuleName;
+(*
 /**
  * Get the array of included ranges that was used to parse the syntax tree.
  *

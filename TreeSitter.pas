@@ -69,6 +69,7 @@ type
     constructor Create(ATree: PTSTree); virtual;
     destructor Destroy; override;
 
+    function Language: PTSLanguage;
     function RootNode: TTSNode;
     function TreeNilSafe: PTSTree;
 
@@ -216,6 +217,11 @@ begin
   if FTree <> nil then
     ts_tree_delete(FTree);
   inherited;
+end;
+
+function TTSTree.Language: PTSLanguage;
+begin
+  Result:= ts_tree_language(FTree);
 end;
 
 function TTSTree.RootNode: TTSNode;
