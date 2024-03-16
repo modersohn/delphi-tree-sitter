@@ -133,6 +133,10 @@
         </DCCReference>
         <DCCReference Include="..\TreeSitter.pas"/>
         <DCCReference Include="..\TreeSitterLib.pas"/>
+        <DCCReference Include="frmDTSLanguage.pas">
+            <Form>DTSLanguage</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

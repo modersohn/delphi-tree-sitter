@@ -93,7 +93,7 @@ object DTSMain: TDTSMain
       Height = 23
       Style = csDropDownList
       Anchors = [akTop, akRight]
-      TabOrder = 2
+      TabOrder = 3
     end
     object btnGetChildByField: TButton
       Left = 658
@@ -102,7 +102,16 @@ object DTSMain: TDTSMain
       Height = 25
       Action = actGetChildByField
       Anchors = [akTop, akRight]
-      TabOrder = 3
+      TabOrder = 4
+    end
+    object btnLangInfo: TButton
+      Left = 288
+      Top = 13
+      Width = 40
+      Height = 25
+      Caption = 'Info'
+      TabOrder = 2
+      OnClick = btnLangInfoClick
     end
   end
   object Panel1: TPanel
@@ -146,7 +155,7 @@ object DTSMain: TDTSMain
       Height = 250
       Align = alBottom
       ColCount = 2
-      DefaultColWidth = 100
+      DefaultColWidth = 120
       DefaultRowHeight = 18
       FixedRows = 0
       Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goFixedRowDefAlign]

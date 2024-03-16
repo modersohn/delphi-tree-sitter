@@ -7,21 +7,39 @@ uses
   TreeSitterLib;
 
 type
+  ETreeSitterException = Exception;
+
+  //some aliases, so TreeSitterLib is not needed in uses clause
+  PTSLanguage = TreeSitterLib.PTSLanguage;
+  TTSLanguage = TSLanguage;
+
+  TSFieldId = TreeSitterLib.TSFieldId;
+  TSSymbol = TreeSitterLib.TSSymbol;
+  TSSymbolType = TreeSitterLib.TSSymbolType;
+
   PTSGetLanguageFunc = ^TTSGetLanguageFunc;
   TTSGetLanguageFunc = function(): PTSLanguage; cdecl;
 
-  TSLanguageHelper = record helper for TSLanguage
+  TTSLanguageHelper = record helper for TTSLanguage
   private
     function GetFieldName(AFieldId: TSFieldId): string;
     function GetFieldId(const AFieldName: string): TSFieldId;
+    function GetSymbolName(ASymbol: TSSymbol): string;
+    function GetSymbolForName(const ASymbolName: string; AIsNamed: Boolean): TSSymbol;
+    function GetSymbolType(ASymbol: TSSymbol): TSSymbolType;
   public
+    function Version: UInt32;
     function FieldCount: UInt32;
+    function SymbolCount: UInt32;
+
+    function NextState(AState: TSStateId; ASymbol: TSSymbol): TSStateId;
 
     property FieldName[AFieldId: TSFieldId]: string read GetFieldName;
     property FieldId[const AFieldName: string]: TSFieldId read GetFieldId;
+    property SymbolName[ASymbol: TSSymbol]: string read GetSymbolName;
+    property SymbolForName[const ASymbolName: string; AIsNamed: Boolean]: TSSymbol read GetSymbolForName;
+    property SymbolType[ASymbol: TSSymbol]: TSSymbolType read GetSymbolType;
   end;
-
-  ETreeSitterException = Exception;
 
   TTSTree = class;
   TTSNode = TSNode;
@@ -92,6 +110,8 @@ type
   end;
 
   TTSNodeHelper = record helper for TTSNode
+    function Language: PTSLanguage;
+
     function NodeType: string;
     function Symbol: TSSymbol;
     function GrammarType: string;
@@ -304,6 +324,11 @@ begin
   Result:= ts_node_is_null(Self);
 end;
 
+function TTSNodeHelper.Language: PTSLanguage;
+begin
+  Result:= ts_node_language(Self);
+end;
+
 function TTSNodeHelper.NamedChild(AIndex: Integer): TTSNode;
 begin
   Result:= ts_node_named_child(Self, AIndex);
@@ -379,14 +404,14 @@ begin
   Result:= Format('(%d, %d)', [row, column]);
 end;
 
-{ TSLanguageHelper }
+{ TTSLanguageHelper }
 
-function TSLanguageHelper.FieldCount: UInt32;
+function TTSLanguageHelper.FieldCount: UInt32;
 begin
   Result:= ts_language_field_count(@Self);
 end;
 
-function TSLanguageHelper.GetFieldId(const AFieldName: string): TSFieldId;
+function TTSLanguageHelper.GetFieldId(const AFieldName: string): TSFieldId;
 var
   ansiFieldName: AnsiString;
 begin
@@ -394,9 +419,43 @@ begin
   Result:= ts_language_field_id_for_name(@Self, PAnsiChar(ansiFieldName), Length(ansiFieldName));
 end;
 
-function TSLanguageHelper.GetFieldName(AFieldId: TSFieldId): string;
+function TTSLanguageHelper.GetFieldName(AFieldId: TSFieldId): string;
 begin
   Result:= string(AnsiString(ts_language_field_name_for_id(@Self, AFieldId)));
+end;
+
+function TTSLanguageHelper.GetSymbolForName(const ASymbolName: string; AIsNamed: Boolean): TSSymbol;
+var
+  ansiSymbolName: AnsiString;
+begin
+  ansiSymbolName:= AnsiString(ASymbolName);
+  Result:= ts_language_symbol_for_name(@Self, PAnsiChar(ansiSymbolName), Length(ansiSymbolName), AIsNamed);
+end;
+
+function TTSLanguageHelper.GetSymbolName(ASymbol: TSSymbol): string;
+begin
+  Result:= string(AnsiString(ts_language_symbol_name(@Self, ASymbol)));
+end;
+
+function TTSLanguageHelper.GetSymbolType(ASymbol: TSSymbol): TSSymbolType;
+begin
+  Result:= ts_language_symbol_type(@Self, ASymbol);
+end;
+
+function TTSLanguageHelper.NextState(AState: TSStateId;
+  ASymbol: TSSymbol): TSStateId;
+begin
+  Result:= ts_language_next_state(@Self, AState, ASymbol);
+end;
+
+function TTSLanguageHelper.SymbolCount: UInt32;
+begin
+  Result:= ts_language_symbol_count(@Self);
+end;
+
+function TTSLanguageHelper.Version: UInt32;
+begin
+  Result:= ts_language_version(@Self);
 end;
 
 { TTSTreeCursor }

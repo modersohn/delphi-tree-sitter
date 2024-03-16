@@ -4,7 +4,8 @@ uses
   Vcl.Forms,
   frmDTSMain in 'frmDTSMain.pas' {DTSMain},
   TreeSitter in '..\TreeSitter.pas',
-  TreeSitterLib in '..\TreeSitterLib.pas';
+  TreeSitterLib in '..\TreeSitterLib.pas',
+  frmDTSLanguage in 'frmDTSLanguage.pas' {DTSLanguage};
 
 {$R *.res}
 

@@ -42,6 +42,7 @@ type
     mnuactGotoPrevSibling: TMenuItem;
     N2: TMenuItem;
     N3: TMenuItem;
+    btnLangInfo: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure memCodeExit(Sender: TObject);
@@ -67,6 +68,7 @@ type
     procedure actGotoNextSiblingUpdate(Sender: TObject);
     procedure actGotoPrevSiblingExecute(Sender: TObject);
     procedure actGotoPrevSiblingUpdate(Sender: TObject);
+    procedure btnLangInfoClick(Sender: TObject);
   private
     FParser: TTSParser;
     FTree: TTSTree;
@@ -94,6 +96,7 @@ var
 implementation
 
 uses
+  frmDTSLanguage,
   UITypes;
 
 {$R *.dfm}
@@ -189,6 +192,11 @@ begin
   actShowNodeAsString.Enabled:= not SelectedTSNode.IsNull;
 end;
 
+procedure TDTSMain.btnLangInfoClick(Sender: TObject);
+begin
+  ShowLanguageInfo(FParser.Language);
+end;
+
 procedure TDTSMain.btnLoadClick(Sender: TObject);
 begin
   if not OD.Execute(Handle) then
@@ -256,9 +264,9 @@ end;
 
 procedure TDTSMain.FillNodeProps(const ANode: TTSNode);
 begin
-  sgNodeProps.Cells[1, Ord(rowSymbol)]:= IntToStr(ANode.Symbol);
+  sgNodeProps.Cells[1, Ord(rowSymbol)]:= Format('%d (%s)', [ANode.Symbol, ANode.Language^.SymbolName[ANode.Symbol]]);
   sgNodeProps.Cells[1, Ord(rowGrammarType)]:= ANode.GrammarType;
-  sgNodeProps.Cells[1, Ord(rowGrammarSymbol)]:= IntToStr(ANode.GrammarSymbol);
+  sgNodeProps.Cells[1, Ord(rowGrammarSymbol)]:= Format('%d (%s)', [ANode.GrammarSymbol, ANode.Language^.SymbolName[ANode.GrammarSymbol]]);
   sgNodeProps.Cells[1, Ord(rowIsError)]:= BoolToStr(ANode.IsError, True);
   sgNodeProps.Cells[1, Ord(rowHasError)]:= BoolToStr(ANode.HasError, True);
   sgNodeProps.Cells[1, Ord(rowIsExtra)]:= BoolToStr(ANode.IsExtra, True);
