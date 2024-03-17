@@ -16,8 +16,8 @@ Windows only for now and only tested with Delphi.
 | Tree | Basics covered |
 | TreeCursor | Mostly complete |
 | Node | Mostly complete |
-| Query | Missing |
-| QueryCursor | Missing |
+| Query | Mostly complete |
+| QueryCursor | Complete except demo |
 | LookAheadIterator | Missing |
 | WebAssembly Integration | Missing |
 
@@ -50,3 +50,7 @@ Inspector-like grid with node properties. Navigation via popup menu of the tree.
 
 Now with secondary form listing symbols, fields and version of the language:
 ![image](https://github.com/modersohn/delphi-tree-sitter/assets/44807458/1243f2fe-ca26-4658-a24e-55ab11c5c153)
+
+New query form started, for now only showing info about the query, no matches, QueryCursor usage yet:
+![image](https://github.com/modersohn/delphi-tree-sitter/assets/44807458/6bff648a-b062-41f3-8464-0b5100a84e65)
+
