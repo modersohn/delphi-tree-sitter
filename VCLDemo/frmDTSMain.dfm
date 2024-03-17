@@ -1,7 +1,9 @@
-object DTSMain: TDTSMain
+object DTSMainForm: TDTSMainForm
   Left = 0
   Top = 0
-  Caption = 'Tree-Sitter for Delphi demo'
+  Caption = 
+    'Tree-Sitter for Delphi demo - https://github.com/modersohn/delph' +
+    'i-tree-sitter'
   ClientHeight = 478
   ClientWidth = 765
   Color = clBtnFace

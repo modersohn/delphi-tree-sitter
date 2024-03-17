@@ -128,13 +128,13 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="frmDTSMain.pas">
-            <Form>DTSMain</Form>
+            <Form>DTSMainForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\TreeSitter.pas"/>
         <DCCReference Include="..\TreeSitterLib.pas"/>
         <DCCReference Include="frmDTSLanguage.pas">
-            <Form>DTSLanguage</Form>
+            <Form>DTSLanguageForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Base">

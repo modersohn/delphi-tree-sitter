@@ -8,7 +8,7 @@ uses
   Vcl.ExtCtrls, Vcl.Grids, Vcl.StdCtrls, TreeSitter;
 
 type
-  TDTSLanguage = class(TForm)
+  TDTSLanguageForm = class(TForm)
     lblFieldCount: TLabel;
     pnlTop: TPanel;
     sgSymbols: TStringGrid;
@@ -25,7 +25,7 @@ type
   end;
 
 var
-  DTSLanguage: TDTSLanguage;
+  DTSLanguageForm: TDTSLanguageForm;
 
   procedure ShowLanguageInfo(ALanguage: PTSLanguage);
 
@@ -35,27 +35,27 @@ implementation
 
 procedure ShowLanguageInfo(ALanguage: PTSLanguage);
 begin
-  if DTSLanguage = nil then
+  if DTSLanguageForm = nil then
   begin
-    Application.Createform(TDTSLanguage, DTSLanguage);
-    DTSLanguage.sgFields.ColWidths[1]:= 50;
-    DTSLanguage.sgSymbols.ColWidths[0]:= 200;
-    DTSLanguage.sgSymbols.ColWidths[1]:= 50;
+    Application.Createform(TDTSLanguageForm, DTSLanguageForm);
+    DTSLanguageForm.sgFields.ColWidths[1]:= 50;
+    DTSLanguageForm.sgSymbols.ColWidths[0]:= 200;
+    DTSLanguageForm.sgSymbols.ColWidths[1]:= 50;
   end;
-  DTSLanguage.FLanguage:= ALanguage;
-  DTSLanguage.UpdateLanguage;
-  DTSLanguage.Show;
-  DTSLanguage.BringToFront;
+  DTSLanguageForm.FLanguage:= ALanguage;
+  DTSLanguageForm.UpdateLanguage;
+  DTSLanguageForm.Show;
+  DTSLanguageForm.BringToFront;
 end;
 
-procedure TDTSLanguage.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TDTSLanguageForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Action:= caFree;
-  if Self = DTSLanguage then
-    DTSLanguage:= nil;
+  if Self = DTSLanguageForm then
+    DTSLanguageForm:= nil;
 end;
 
-procedure TDTSLanguage.UpdateLanguage;
+procedure TDTSLanguageForm.UpdateLanguage;
 const
   SymbolTypes: array[TSSymbolType] of string = ('Regular', 'Anonymous',
     'Auxiliary');

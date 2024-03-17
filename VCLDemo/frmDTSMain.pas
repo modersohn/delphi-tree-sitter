@@ -9,7 +9,7 @@ uses
   System.Actions, Vcl.ActnList, Vcl.Menus;
 
 type
-  TDTSMain = class(TForm)
+  TDTSMainForm = class(TForm)
     memCode: TMemo;
     pnlTop: TPanel;
     treeView: TTreeView;
@@ -91,7 +91,7 @@ type
   end;
 
 var
-  DTSMain: TDTSMain;
+  DTSMainForm: TDTSMainForm;
 
 implementation
 
@@ -114,7 +114,7 @@ const
     'NamedChildCount', 'StartByte', 'StartPoint', 'EndByte', 'EndPoint',
     'DescendantCount');
 
-procedure TDTSMain.actGetChildByFieldExecute(Sender: TObject);
+procedure TDTSMainForm.actGetChildByFieldExecute(Sender: TObject);
 var
   foundNode: TTSNode;
 begin
@@ -126,78 +126,78 @@ begin
     SelectedTSNode:= foundNode;
 end;
 
-procedure TDTSMain.actGetChildByFieldUpdate(Sender: TObject);
+procedure TDTSMainForm.actGetChildByFieldUpdate(Sender: TObject);
 begin
   actGetChildByField.Enabled:= (not SelectedTSNode.IsNull) and
     (cbFields.ItemIndex >= 0);
 end;
 
-procedure TDTSMain.actGotoExecute(Sender: TObject);
+procedure TDTSMainForm.actGotoExecute(Sender: TObject);
 begin
   //to keep it enabled
 end;
 
-procedure TDTSMain.actGotoFirstChildExecute(Sender: TObject);
+procedure TDTSMainForm.actGotoFirstChildExecute(Sender: TObject);
 begin
   SelectedTSNode:= SelectedTSNode.NamedChild(0);
 end;
 
-procedure TDTSMain.actGotoFirstChildUpdate(Sender: TObject);
+procedure TDTSMainForm.actGotoFirstChildUpdate(Sender: TObject);
 begin
   actGotoFirstChild.Enabled:= SelectedTSNode.NamedChildCount > 0;
 end;
 
-procedure TDTSMain.actGotoNextSiblingExecute(Sender: TObject);
+procedure TDTSMainForm.actGotoNextSiblingExecute(Sender: TObject);
 begin
   SelectedTSNode:= SelectedTSNode.NextNamedSibling;
 end;
 
-procedure TDTSMain.actGotoNextSiblingUpdate(Sender: TObject);
+procedure TDTSMainForm.actGotoNextSiblingUpdate(Sender: TObject);
 begin
   actGotoNextSibling.Enabled:= not SelectedTSNode.NextNamedSibling.IsNull;
 end;
 
-procedure TDTSMain.actGotoParentExecute(Sender: TObject);
+procedure TDTSMainForm.actGotoParentExecute(Sender: TObject);
 begin
   SelectedTSNode:= SelectedTSNode.Parent;
 end;
 
-procedure TDTSMain.actGotoParentUpdate(Sender: TObject);
+procedure TDTSMainForm.actGotoParentUpdate(Sender: TObject);
 begin
   actGotoParent.Enabled:= not SelectedTSNode.Parent.IsNull;
 end;
 
-procedure TDTSMain.actGotoPrevSiblingExecute(Sender: TObject);
+procedure TDTSMainForm.actGotoPrevSiblingExecute(Sender: TObject);
 begin
   SelectedTSNode:= SelectedTSNode.PrevNamedSibling;
 end;
 
-procedure TDTSMain.actGotoPrevSiblingUpdate(Sender: TObject);
+procedure TDTSMainForm.actGotoPrevSiblingUpdate(Sender: TObject);
 begin
   actGotoPrevSibling.Enabled:= not SelectedTSNode.PrevNamedSibling.IsNull;
 end;
 
-procedure TDTSMain.actGotoUpdate(Sender: TObject);
+procedure TDTSMainForm.actGotoUpdate(Sender: TObject);
 begin
   actGoto.Enabled:= not SelectedTSNode.IsNull;
 end;
 
-procedure TDTSMain.actShowNodeAsStringExecute(Sender: TObject);
+procedure TDTSMainForm.actShowNodeAsStringExecute(Sender: TObject);
 begin
   ShowMessage(SelectedTSNode.ToString);
 end;
 
-procedure TDTSMain.actShowNodeAsStringUpdate(Sender: TObject);
+procedure TDTSMainForm.actShowNodeAsStringUpdate(Sender: TObject);
 begin
   actShowNodeAsString.Enabled:= not SelectedTSNode.IsNull;
 end;
 
-procedure TDTSMain.btnLangInfoClick(Sender: TObject);
+procedure TDTSMainForm.btnLangInfoClick(Sender: TObject);
 begin
   ShowLanguageInfo(FParser.Language);
 end;
 
-procedure TDTSMain.btnLoadClick(Sender: TObject);
+procedure TDTSMainForm.btnLoadClick(Sender: TObject);
 begin
   if not OD.Execute(Handle) then
     Exit;
@@ -206,7 +206,7 @@ begin
   ParseContent;
 end;
 
-procedure TDTSMain.LoadLanguageParser(const ALangBaseName: string);
+procedure TDTSMainForm.LoadLanguageParser(const ALangBaseName: string);
 //hard coded naming scheme
 //  DLL name: tree-sitter-<lang>
 //  method name returning TSLanguage: tree_sitter_<lang>
@@ -232,7 +232,7 @@ begin
   LoadLanguageFields;
 end;
 
-procedure TDTSMain.LoadLanguageFields;
+procedure TDTSMainForm.LoadLanguageFields;
 var
   i: UInt32;
 begin
@@ -248,13 +248,13 @@ begin
   end;
 end;
 
-procedure TDTSMain.cbCodeChange(Sender: TObject);
+procedure TDTSMainForm.cbCodeChange(Sender: TObject);
 begin
   LoadLanguageParser(cbCode.Items[cbCode.ItemIndex]);
   ParseContent;
 end;
 
-procedure TDTSMain.ClearNodeProps;
+procedure TDTSMainForm.ClearNodeProps;
 var
   row: TSGNodePropRow;
 begin
@@ -262,7 +262,7 @@ begin
     sgNodeProps.Cells[1, Ord(row)]:= '';
 end;
 
-procedure TDTSMain.FillNodeProps(const ANode: TTSNode);
+procedure TDTSMainForm.FillNodeProps(const ANode: TTSNode);
 begin
   sgNodeProps.Cells[1, Ord(rowSymbol)]:= Format('%d (%s)', [ANode.Symbol, ANode.Language^.SymbolName[ANode.Symbol]]);
   sgNodeProps.Cells[1, Ord(rowGrammarType)]:= ANode.GrammarType;
@@ -281,7 +281,7 @@ begin
   sgNodeProps.Cells[1, Ord(rowDescendantCount)]:= IntToStr(ANode.DescendantCount);
 end;
 
-procedure TDTSMain.FormCreate(Sender: TObject);
+procedure TDTSMainForm.FormCreate(Sender: TObject);
 var
   row: TSGNodePropRow;
 begin
@@ -295,20 +295,20 @@ begin
   cbCodeChange(nil);
 end;
 
-procedure TDTSMain.FormDestroy(Sender: TObject);
+procedure TDTSMainForm.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FTree);
   FreeAndNil(FParser);
 end;
 
-function TDTSMain.GetSelectedTSNode: TTSNode;
+function TDTSMainForm.GetSelectedTSNode: TTSNode;
 begin
   if treeView.Selected is TTSTreeViewNode then
     Result:= TTSTreeViewNode(treeView.Selected).TSNode else
     Result:= FTree.RootNode.Parent; //easy way to create a NULL node
 end;
 
-procedure TDTSMain.ParseContent;
+procedure TDTSMainForm.ParseContent;
 var
   root: TTSNode;
   rootNode: TTSTreeViewNode;
@@ -328,7 +328,7 @@ begin
   FEditChanged:= False;
 end;
 
-procedure TDTSMain.SetSelectedTSNode(const Value: TTSNode);
+procedure TDTSMainForm.SetSelectedTSNode(const Value: TTSNode);
 
   function FindViaParent(const ATSNode: TTSNode): TTreeNode;
   var
@@ -359,7 +359,7 @@ begin
   treeView.Selected:= FindViaParent(Value);
 end;
 
-procedure TDTSMain.treeViewChange(Sender: TObject; Node: TTreeNode);
+procedure TDTSMainForm.treeViewChange(Sender: TObject; Node: TTreeNode);
 var
   tsSelected: TTSNode;
   ptStart, ptEnd: TTSPoint;
@@ -395,13 +395,13 @@ begin
   SendMessage(memCode.Handle, EM_SCROLLCARET, 0, 0);
 end;
 
-procedure TDTSMain.treeViewCreateNodeClass(Sender: TCustomTreeView;
+procedure TDTSMainForm.treeViewCreateNodeClass(Sender: TCustomTreeView;
   var NodeClass: TTreeNodeClass);
 begin
   NodeClass:= TTSTreeViewNode;
 end;
 
-procedure TDTSMain.treeViewExpanding(Sender: TObject; Node: TTreeNode;
+procedure TDTSMainForm.treeViewExpanding(Sender: TObject; Node: TTreeNode;
   var AllowExpansion: Boolean);
 var
   tsCursor: TTSTreeCursor;
@@ -434,12 +434,12 @@ begin
   end;
 end;
 
-procedure TDTSMain.memCodeChange(Sender: TObject);
+procedure TDTSMainForm.memCodeChange(Sender: TObject);
 begin
   FEditChanged:= True;
 end;
 
-procedure TDTSMain.memCodeExit(Sender: TObject);
+procedure TDTSMainForm.memCodeExit(Sender: TObject);
 begin
   if FEditChanged then
     ParseContent;

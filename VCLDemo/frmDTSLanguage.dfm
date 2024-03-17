@@ -1,4 +1,4 @@
-object DTSLanguage: TDTSLanguage
+object DTSLanguageForm: TDTSLanguageForm
   Left = 0
   Top = 0
   Caption = 'Language Info'
@@ -64,8 +64,8 @@ object DTSLanguage: TDTSLanguage
     DefaultColWidth = 130
     DefaultRowHeight = 18
     FixedCols = 0
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goFixedRowDefAlign]
     TabOrder = 2
-    ExplicitLeft = 226
   end
   object sgFields: TStringGrid
     Left = 0
@@ -77,6 +77,7 @@ object DTSLanguage: TDTSLanguage
     DefaultColWidth = 120
     DefaultRowHeight = 18
     FixedCols = 0
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goFixedRowDefAlign]
     TabOrder = 0
   end
 end
