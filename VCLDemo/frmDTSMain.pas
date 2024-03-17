@@ -43,6 +43,7 @@ type
     N2: TMenuItem;
     N3: TMenuItem;
     btnLangInfo: TButton;
+    btnQuery: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure memCodeExit(Sender: TObject);
@@ -69,6 +70,7 @@ type
     procedure actGotoPrevSiblingExecute(Sender: TObject);
     procedure actGotoPrevSiblingUpdate(Sender: TObject);
     procedure btnLangInfoClick(Sender: TObject);
+    procedure btnQueryClick(Sender: TObject);
   private
     FParser: TTSParser;
     FTree: TTSTree;
@@ -97,6 +99,7 @@ implementation
 
 uses
   frmDTSLanguage,
+  frmDTSQuery,
   UITypes;
 
 {$R *.dfm}
@@ -204,6 +207,11 @@ begin
   memCode.Lines.LoadFromFile(OD.FileName);
   FEditChanged:= True;
   ParseContent;
+end;
+
+procedure TDTSMainForm.btnQueryClick(Sender: TObject);
+begin
+  ShowQueryForm(FTree);
 end;
 
 procedure TDTSMainForm.LoadLanguageParser(const ALangBaseName: string);

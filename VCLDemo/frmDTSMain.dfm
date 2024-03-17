@@ -51,7 +51,7 @@ object DTSMainForm: TDTSMainForm
     BevelOuter = bvNone
     TabOrder = 0
     object lblCode: TLabel
-      Left = 104
+      Left = 96
       Top = 17
       Width = 31
       Height = 15
@@ -68,14 +68,14 @@ object DTSMainForm: TDTSMainForm
     object btnLoad: TButton
       Left = 8
       Top = 13
-      Width = 75
+      Width = 66
       Height = 25
       Caption = 'Load...'
       TabOrder = 0
       OnClick = btnLoadClick
     end
     object cbCode: TComboBox
-      Left = 141
+      Left = 133
       Top = 14
       Width = 145
       Height = 23
@@ -95,7 +95,7 @@ object DTSMainForm: TDTSMainForm
       Height = 23
       Style = csDropDownList
       Anchors = [akTop, akRight]
-      TabOrder = 3
+      TabOrder = 4
     end
     object btnGetChildByField: TButton
       Left = 658
@@ -104,16 +104,25 @@ object DTSMainForm: TDTSMainForm
       Height = 25
       Action = actGetChildByField
       Anchors = [akTop, akRight]
-      TabOrder = 4
+      TabOrder = 5
     end
     object btnLangInfo: TButton
-      Left = 288
+      Left = 280
       Top = 13
       Width = 40
       Height = 25
       Caption = 'Info'
       TabOrder = 2
       OnClick = btnLangInfoClick
+    end
+    object btnQuery: TButton
+      Left = 336
+      Top = 13
+      Width = 66
+      Height = 25
+      Caption = 'Query...'
+      TabOrder = 3
+      OnClick = btnQueryClick
     end
   end
   object Panel1: TPanel

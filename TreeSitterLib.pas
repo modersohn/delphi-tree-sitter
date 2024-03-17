@@ -52,7 +52,9 @@ type
   TSParser = record end;
   PTSTree = ^TSTree;
   TSTree = record end;
+  PTSQuery = ^TSQuery;
   TSQuery = record end;
+  PTSQueryCursor = ^TSQueryCursor;
   TSQueryCursor = record end;
   TSLookaheadIterator = record end;
 
@@ -107,43 +109,54 @@ typedef struct TSInputEdit {
     id: Pointer;
     context: array[1..2] of UInt32;
   end;
-(*
-typedef struct TSQueryCapture {
-  TSNode node;
-  uint32_t index;
-} TSQueryCapture;
-typedef enum TSQuantifier {
-  TSQuantifierZero = 0, // must match the array initialization value
-  TSQuantifierZeroOrOne,
-  TSQuantifierZeroOrMore,
-  TSQuantifierOne,
-  TSQuantifierOneOrMore,
-} TSQuantifier;
-typedef struct TSQueryMatch {
-  uint32_t id;
-  uint16_t pattern_index;
-  uint16_t capture_count;
-  const TSQueryCapture *captures;
-} TSQueryMatch;
-typedef enum TSQueryPredicateStepType {
-  TSQueryPredicateStepTypeDone,
-  TSQueryPredicateStepTypeCapture,
-  TSQueryPredicateStepTypeString,
-} TSQueryPredicateStepType;
-typedef struct TSQueryPredicateStep {
-  TSQueryPredicateStepType type;
-  uint32_t value_id;
-} TSQueryPredicateStep;
-typedef enum TSQueryError {
-  TSQueryErrorNone = 0,
-  TSQueryErrorSyntax,
-  TSQueryErrorNodeType,
-  TSQueryErrorField,
-  TSQueryErrorCapture,
-  TSQueryErrorStructure,
-  TSQueryErrorLanguage,
-} TSQueryError;
-*)
+
+  TSQueryCapture = record
+    node: TSNode;
+    index: UInt32;
+  end;
+
+  PSQueryCaptureArray = ^TSQueryCaptureArray;
+  TSQueryCaptureArray = array[0..0] of TSQueryCapture;
+
+  TSQuantifier = (
+    TSQuantifierZero,// = 0, // must match the array initialization value
+    TSQuantifierZeroOrOne,
+    TSQuantifierZeroOrMore,
+    TSQuantifierOne,
+    TSQuantifierOneOrMore);
+
+  TSQueryMatch = record
+    id: UInt32;
+    pattern_index: UInt16;
+    capture_count: UInt16;
+    captures: PSQueryCaptureArray;
+  end;
+
+  PTSQueryMatchArray = ^TSQueryMatchArray;
+  TSQueryMatchArray = array[0..0] of TSQueryMatch;
+
+  TSQueryPredicateStepType = (
+    TSQueryPredicateStepTypeDone,
+    TSQueryPredicateStepTypeCapture,
+    TSQueryPredicateStepTypeString);
+
+  TSQueryPredicateStep = record
+    &type: TSQueryPredicateStepType;
+    value_id: UInt32;
+  end;
+
+  PTSQueryPredicateStepArray = ^TSQueryPredicateStepArray;
+  TSQueryPredicateStepArray = array[0..0] of TSQueryPredicateStep;
+
+  TSQueryError = (
+    TSQueryErrorNone,// = 0,
+    TSQueryErrorSyntax,
+    TSQueryErrorNodeType,
+    TSQueryErrorField,
+    TSQueryErrorCapture,
+    TSQueryErrorStructure,
+    TSQueryErrorLanguage);
+
 (*
 /********************/
 /* Section - Parser */
@@ -351,6 +364,8 @@ TSLogger ts_parser_logger(const TSParser *self);
  * SVG output. You can turn off this logging by passing a negative number.
  */
 void ts_parser_print_dot_graphs(TSParser *self, int fd);
+*)
+(*
 /******************/
 /* Section - Tree */
 /******************/
@@ -360,7 +375,9 @@ void ts_parser_print_dot_graphs(TSParser *self, int fd);
  * You need to copy a syntax tree in order to use it on more than one thread at
  * a time, as syntax trees are not thread safe.
  */
-TSTree *ts_tree_copy(const TSTree *self);
+*)
+function ts_tree_copy(const self: PTSTree): PTSTree; cdecl; external ModuleName;
+(*
 /**
  * Delete the syntax tree, freeing all of the memory that it used.
  */
@@ -852,30 +869,37 @@ function ts_tree_cursor_copy(const cursor: PTSTreeCursor): TSTreeCursor; cdecl; 
  * 1. The byte offset of the error is written to the `error_offset` parameter.
  * 2. The type of error is written to the `error_type` parameter.
  */
-TSQuery *ts_query_new(
-  const TSLanguage *language,
-  const char *source,
-  uint32_t source_len,
-  uint32_t *error_offset,
-  TSQueryError *error_type
-);
+*)
+function ts_query_new(
+  const language: PTSLanguage;
+  const source: PAnsiChar;
+  source_len: UInt32;
+  var error_offset: UInt32;
+  var error_type: TSQueryError): PTSQuery; cdecl; external ModuleName;
+(*
 /**
  * Delete a query, freeing all of the memory that it used.
  */
-void ts_query_delete(TSQuery *self);
+*)
+procedure ts_query_delete(self: PTSQuery); cdecl; external ModuleName;
+(*
 /**
  * Get the number of patterns, captures, or string literals in the query.
  */
-uint32_t ts_query_pattern_count(const TSQuery *self);
-uint32_t ts_query_capture_count(const TSQuery *self);
-uint32_t ts_query_string_count(const TSQuery *self);
+*)
+function ts_query_pattern_count(const self: PTSQuery): UInt32; cdecl; external ModuleName;
+function ts_query_capture_count(const self: PTSQuery): UInt32; cdecl; external ModuleName;
+function ts_query_string_count(const self: PTSQuery): UInt32; cdecl; external ModuleName;
+(*
 /**
  * Get the byte offset where the given pattern starts in the query's source.
  *
  * This can be useful when combining queries by concatenating their source
  * code strings.
  */
-uint32_t ts_query_start_byte_for_pattern(const TSQuery *self, uint32_t pattern_index);
+*)
+function ts_query_start_byte_for_pattern(const self: PTSQuery; pattern_index: UInt32): UInt32; cdecl; external ModuleName;
+(*
 /**
  * Get all of the predicates for the given pattern in the query.
  *
@@ -892,11 +916,13 @@ uint32_t ts_query_start_byte_for_pattern(const TSQuery *self, uint32_t pattern_i
  *    that represent the end of an individual predicate. If a pattern has two
  *    predicates, then there will be two steps with this `type` in the array.
  */
-const TSQueryPredicateStep *ts_query_predicates_for_pattern(
-  const TSQuery *self,
-  uint32_t pattern_index,
-  uint32_t *step_count
-);
+*)
+function ts_query_predicates_for_pattern(
+  const self: PTSQuery;
+  pattern_index: UInt32;
+  var step_count: UInt32
+): PTSQueryPredicateStepArray; cdecl; external ModuleName;
+(*
 /*
  * Check if the given pattern in the query has a single root node.
  */
@@ -915,30 +941,37 @@ bool ts_query_is_pattern_non_local(const TSQuery *self, uint32_t pattern_index);
  * The step is specified by its byte offset in the query's source code.
  */
 bool ts_query_is_pattern_guaranteed_at_step(const TSQuery *self, uint32_t byte_offset);
+*)
+(*
 /**
  * Get the name and length of one of the query's captures, or one of the
  * query's string literals. Each capture and string is associated with a
  * numeric id based on the order that it appeared in the query's source.
  */
-const char *ts_query_capture_name_for_id(
-  const TSQuery *self,
-  uint32_t index,
-  uint32_t *length
-);
+*)
+function ts_query_capture_name_for_id(
+  const self: PTSQuery;
+  index: UInt32;
+  var length: UInt32
+): PAnsiChar; cdecl; external ModuleName;
+(*
 /**
  * Get the quantifier of the query's captures. Each capture is * associated
  * with a numeric id based on the order that it appeared in the query's source.
  */
-TSQuantifier ts_query_capture_quantifier_for_id(
-  const TSQuery *self,
-  uint32_t pattern_index,
-  uint32_t capture_index
-);
-const char *ts_query_string_value_for_id(
-  const TSQuery *self,
-  uint32_t index,
-  uint32_t *length
-);
+*)
+function ts_query_capture_quantifier_for_id(
+  const self: PTSQuery;
+  pattern_index: UInt32;
+  capture_index: UInt32
+): TSQuantifier; cdecl; external ModuleName;
+
+function ts_query_string_value_for_id(
+  const self: PTSQuery;
+  index: UInt32;
+  var length: UInt32
+): PAnsiChar; cdecl; external ModuleName;
+(*
 /**
  * Disable a certain capture within a query.
  *
@@ -954,6 +987,8 @@ void ts_query_disable_capture(TSQuery *self, const char *name, uint32_t length);
  * associated with the pattern. Currently, there is no way to undo this.
  */
 void ts_query_disable_pattern(TSQuery *self, uint32_t pattern_index);
+*)
+(*
 /**
  * Create a new cursor for executing a given query.
  *
@@ -976,15 +1011,21 @@ void ts_query_disable_pattern(TSQuery *self, uint32_t pattern_index);
  *  You can then start executing another query on another node by calling
  *  [`ts_query_cursor_exec`] again.
  */
-TSQueryCursor *ts_query_cursor_new(void);
+*)
+function ts_query_cursor_new: PTSQueryCursor; cdecl; external ModuleName;
+(*
 /**
  * Delete a query cursor, freeing all of the memory that it used.
  */
-void ts_query_cursor_delete(TSQueryCursor *self);
+*)
+procedure ts_query_cursor_delete(self: PTSQueryCursor); cdecl; external ModuleName;
+(*
 /**
  * Start running a given query on a given node.
  */
-void ts_query_cursor_exec(TSQueryCursor *self, const TSQuery *query, TSNode node);
+*)
+procedure ts_query_cursor_exec(self: PTSQueryCursor; const query: PTSQuery; node: TSNode); cdecl; external ModuleName;
+(*
 /**
  * Manage the maximum number of in-progress matches allowed by this query
  * cursor.
@@ -996,34 +1037,42 @@ void ts_query_cursor_exec(TSQueryCursor *self, const TSQuery *query, TSNode node
  * any number of pending matches, dynamically allocating new space for them as
  * needed as the query is executed.
  */
-bool ts_query_cursor_did_exceed_match_limit(const TSQueryCursor *self);
-uint32_t ts_query_cursor_match_limit(const TSQueryCursor *self);
-void ts_query_cursor_set_match_limit(TSQueryCursor *self, uint32_t limit);
+*)
+function ts_query_cursor_did_exceed_match_limit(const self: PTSQueryCursor): Boolean; cdecl; external ModuleName;
+function ts_query_cursor_match_limit(const self: PTSQueryCursor): UInt32; cdecl; external ModuleName;
+procedure ts_query_cursor_set_match_limit(self: PTSQueryCursor; limit: UInt32); cdecl; external ModuleName;
+(*
 /**
  * Set the range of bytes or (row, column) positions in which the query
  * will be executed.
  */
 void ts_query_cursor_set_byte_range(TSQueryCursor *self, uint32_t start_byte, uint32_t end_byte);
 void ts_query_cursor_set_point_range(TSQueryCursor *self, TSPoint start_point, TSPoint end_point);
+*)
+(*
 /**
  * Advance to the next match of the currently running query.
  *
  * If there is a match, write it to `*match` and return `true`.
  * Otherwise, return `false`.
  */
-bool ts_query_cursor_next_match(TSQueryCursor *self, TSQueryMatch *match);
-void ts_query_cursor_remove_match(TSQueryCursor *self, uint32_t match_id);
+*)
+function ts_query_cursor_next_match(self: PTSQueryCursor; var match: TSQueryMatch): Boolean; cdecl; external ModuleName;
+procedure ts_query_cursor_remove_match(self: PTSQueryCursor; match_id: UInt32); cdecl; external ModuleName;
+(*
 /**
  * Advance to the next capture of the currently running query.
  *
  * If there is a capture, write its match to `*match` and its index within
  * the matche's capture list to `*capture_index`. Otherwise, return `false`.
  */
-bool ts_query_cursor_next_capture(
-  TSQueryCursor *self,
-  TSQueryMatch *match,
-  uint32_t *capture_index
-);
+*)
+function ts_query_cursor_next_capture(
+  self: PTSQueryCursor;
+  var match: TSQueryMatch;
+  var capture_index: UInt32
+): Boolean; cdecl; external ModuleName;
+(*
 /**
  * Set the maximum start depth for a query cursor.
  *
@@ -1038,7 +1087,9 @@ bool ts_query_cursor_next_capture(
  *
  * Set to `UINT32_MAX` to remove the maximum start depth.
  */
-void ts_query_cursor_set_max_start_depth(TSQueryCursor *self, uint32_t max_start_depth);
+*)
+procedure ts_query_cursor_set_max_start_depth(self: PTSQueryCursor; max_start_depth: UInt32); cdecl; external ModuleName;
+(*
 /**********************/
 /* Section - Language */
 /**********************/

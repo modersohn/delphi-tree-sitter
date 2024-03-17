@@ -137,6 +137,11 @@
             <Form>DTSLanguageForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\TreeSitter.Query.pas"/>
+        <DCCReference Include="frmDTSQuery.pas">
+            <Form>DTSQueryForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

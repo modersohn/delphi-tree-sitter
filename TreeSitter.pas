@@ -72,6 +72,7 @@ type
     function Language: PTSLanguage;
     function RootNode: TTSNode;
     function TreeNilSafe: PTSTree;
+    function Clone: TTSTree;
 
     property Tree: PTSTree read FTree;
   end;
@@ -206,6 +207,11 @@ begin
 end;
 
 { TTSTree }
+
+function TTSTree.Clone: TTSTree;
+begin
+  Result:= TTSTree.Create(ts_tree_copy(FTree));
+end;
 
 constructor TTSTree.Create(ATree: PTSTree);
 begin
