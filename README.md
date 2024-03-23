@@ -17,7 +17,7 @@ Windows only for now and only tested with Delphi.
 | TreeCursor | Mostly complete |
 | Node | Mostly complete |
 | Query | Mostly complete |
-| QueryCursor | Complete except demo |
+| QueryCursor | Mostly complete |
 | LookAheadIterator | Missing |
 | WebAssembly Integration | Missing |
 
@@ -42,6 +42,7 @@ Most parsers do not seem to come with zig-support out of the box, but it should 
 
 ## VCL demo project
 
+Instead of demoing a typical use-case, the VCL demo is intended to allow exploring the API and functionality that tree-sitter supplies.
 ![image](https://github.com/modersohn/delphi-tree-sitter/assets/44807458/3e40aeca-8c4e-4951-8474-bae53563ad3c)
 
 Currently only supports a few languages and a treeview of named nodes with field name and ID where applicable. Selects the corresponding code part in the memo when a node gets selected.
@@ -51,6 +52,7 @@ Inspector-like grid with node properties. Navigation via popup menu of the tree.
 Now with secondary form listing symbols, fields and version of the language:
 ![image](https://github.com/modersohn/delphi-tree-sitter/assets/44807458/1243f2fe-ca26-4658-a24e-55ab11c5c153)
 
-New query form started, for now only showing info about the query, no matches, QueryCursor usage yet:
-![image](https://github.com/modersohn/delphi-tree-sitter/assets/44807458/6bff648a-b062-41f3-8464-0b5100a84e65)
+New query form, showing info about the query and allowing iterating over matches and listing their captures. Selecting a capture, selects the captured node in the main form and selects the corresponding code section:
+![image](https://github.com/modersohn/delphi-tree-sitter/assets/44807458/ac2cba4f-06b2-4a02-8bb4-d02f5adac857)
+
 
