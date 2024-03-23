@@ -9,6 +9,11 @@ uses
   System.Actions, Vcl.ActnList, Vcl.Menus;
 
 type
+  TTSTreeViewNode = class(TTreeNode)
+  public
+    TSNode: TTSNode;
+  end;
+
   TDTSMainForm = class(TForm)
     memCode: TMemo;
     pnlTop: TPanel;
@@ -44,6 +49,9 @@ type
     N3: TMenuItem;
     btnLangInfo: TButton;
     btnQuery: TButton;
+    actNamedNodesOnly: TAction;
+    mnuactNamedNodesOnly: TMenuItem;
+    N4: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure memCodeExit(Sender: TObject);
@@ -71,6 +79,7 @@ type
     procedure actGotoPrevSiblingUpdate(Sender: TObject);
     procedure btnLangInfoClick(Sender: TObject);
     procedure btnQueryClick(Sender: TObject);
+    procedure actNamedNodesOnlyExecute(Sender: TObject);
   private
     FParser: TTSParser;
     FTree: TTSTree;
@@ -82,14 +91,9 @@ type
     procedure ClearNodeProps;
     function GetSelectedTSNode: TTSNode;
     procedure SetSelectedTSNode(const Value: TTSNode);
+    procedure SetupTreeTSNode(ATreeNode: TTSTreeViewNode; ATSNode: TTSNode);
   public
     property SelectedTSNode: TTSNode read GetSelectedTSNode write SetSelectedTSNode;
-  end;
-
-  TTSTreeViewNode = class(TTreeNode)
-  public
-    TSNode: TTSNode;
-    procedure SetupTSNode(ATSNode: TTSNode);
   end;
 
 var
@@ -142,22 +146,30 @@ end;
 
 procedure TDTSMainForm.actGotoFirstChildExecute(Sender: TObject);
 begin
-  SelectedTSNode:= SelectedTSNode.NamedChild(0);
+  if actNamedNodesOnly.Checked then
+    SelectedTSNode:= SelectedTSNode.NamedChild(0) else
+    SelectedTSNode:= SelectedTSNode.Child(0);
 end;
 
 procedure TDTSMainForm.actGotoFirstChildUpdate(Sender: TObject);
 begin
-  actGotoFirstChild.Enabled:= SelectedTSNode.NamedChildCount > 0;
+  if actNamedNodesOnly.Checked then
+    actGotoFirstChild.Enabled:= SelectedTSNode.NamedChildCount > 0 else
+    actGotoFirstChild.Enabled:= SelectedTSNode.ChildCount > 0;
 end;
 
 procedure TDTSMainForm.actGotoNextSiblingExecute(Sender: TObject);
 begin
-  SelectedTSNode:= SelectedTSNode.NextNamedSibling;
+  if actNamedNodesOnly.Checked then
+    SelectedTSNode:= SelectedTSNode.NextNamedSibling else
+    SelectedTSNode:= SelectedTSNode.NextSibling;
 end;
 
 procedure TDTSMainForm.actGotoNextSiblingUpdate(Sender: TObject);
 begin
-  actGotoNextSibling.Enabled:= not SelectedTSNode.NextNamedSibling.IsNull;
+  if actNamedNodesOnly.Checked then
+    actGotoNextSibling.Enabled:= not SelectedTSNode.NextNamedSibling.IsNull else
+    actGotoNextSibling.Enabled:= not SelectedTSNode.NextSibling.IsNull;
 end;
 
 procedure TDTSMainForm.actGotoParentExecute(Sender: TObject);
@@ -172,17 +184,37 @@ end;
 
 procedure TDTSMainForm.actGotoPrevSiblingExecute(Sender: TObject);
 begin
-  SelectedTSNode:= SelectedTSNode.PrevNamedSibling;
+  if actNamedNodesOnly.Checked then
+    SelectedTSNode:= SelectedTSNode.PrevNamedSibling else
+    SelectedTSNode:= SelectedTSNode.PrevSibling;
 end;
 
 procedure TDTSMainForm.actGotoPrevSiblingUpdate(Sender: TObject);
 begin
-  actGotoPrevSibling.Enabled:= not SelectedTSNode.PrevNamedSibling.IsNull;
+  if actNamedNodesOnly.Checked then
+    actGotoPrevSibling.Enabled:= not SelectedTSNode.PrevNamedSibling.IsNull else
+    actGotoPrevSibling.Enabled:= not SelectedTSNode.PrevSibling.IsNull;
 end;
 
 procedure TDTSMainForm.actGotoUpdate(Sender: TObject);
 begin
   actGoto.Enabled:= not SelectedTSNode.IsNull;
+end;
+
+procedure TDTSMainForm.actNamedNodesOnlyExecute(Sender: TObject);
+var
+  root, prevSelected: TTSNode;
+  rootNode: TTSTreeViewNode;
+begin
+  prevSelected:= SelectedTSNode;
+  try
+    treeView.Items.Clear;
+    root:= FTree.RootNode;
+    rootNode:= TTSTreeViewNode(treeView.Items.AddChild(nil, root.NodeType));
+    SetupTreeTSNode(rootNode, root);
+  finally
+    SelectedTSNode:= prevSelected;
+  end;
 end;
 
 procedure TDTSMainForm.actShowNodeAsStringExecute(Sender: TObject);
@@ -334,7 +366,7 @@ begin
   FTree:= FParser.ParseString(sCode);
   root:= FTree.RootNode;
   rootNode:= TTSTreeViewNode(treeView.Items.AddChild(nil, root.NodeType));
-  rootNode.SetupTSNode(root);
+  SetupTreeTSNode(rootNode, root);
   FEditChanged:= False;
   if DTSQueryForm <> nil then
     DTSQueryForm.NewTreeGenerated(FTree);
@@ -430,7 +462,7 @@ begin
     begin
       repeat
         tsNode:= tsCursor.CurrentNode;
-        if not tsNode.IsNamed then
+        if actNamedNodesOnly.Checked and not tsNode.IsNamed then
           Continue;
         if tsCursor.CurrentFieldId > 0 then
           s:= Format('%s (%d): %s', [tsCursor.CurrentFieldName,
@@ -438,7 +470,7 @@ begin
         else
           s:= tsNode.NodeType;
         newTreeNode:= TTSTreeViewNode(treeView.Items.AddChild(Node, s));
-        newTreeNode.SetupTSNode(tsNode);
+        SetupTreeTSNode(newTreeNode, tsNode);
       until not tsCursor.GotoNextSibling;
     end;
   finally
@@ -457,12 +489,12 @@ begin
     ParseContent;
 end;
 
-{ TTSTreeViewNode }
-
-procedure TTSTreeViewNode.SetupTSNode(ATSNode: TTSNode);
+procedure TDTSMainForm.SetupTreeTSNode(ATreeNode: TTSTreeViewNode; ATSNode: TTSNode);
 begin
-  TSNode:= ATSNode;
-  HasChildren:= TSNode.NamedChildCount > 0;
+  ATreeNode.TSNode:= ATSNode;
+  if actNamedNodesOnly.Checked then
+    ATreeNode.HasChildren:= ATSNode.NamedChildCount > 0 else
+    ATreeNode.HasChildren:= ATSNode.ChildCount > 0;
 end;
 
 end.

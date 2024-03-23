@@ -228,10 +228,23 @@ object DTSMainForm: TDTSMainForm
       OnExecute = actGotoPrevSiblingExecute
       OnUpdate = actGotoPrevSiblingUpdate
     end
+    object actNamedNodesOnly: TAction
+      AutoCheck = True
+      Caption = 'Named nodes only'
+      Checked = True
+      OnExecute = actNamedNodesOnlyExecute
+    end
   end
   object pmTree: TPopupMenu
     Left = 416
     Top = 304
+    object mnuactNamedNodesOnly: TMenuItem
+      Action = actNamedNodesOnly
+      AutoCheck = True
+    end
+    object N4: TMenuItem
+      Caption = '-'
+    end
     object mnuactGoto: TMenuItem
       Action = actGoto
       object mnuactGotoParent: TMenuItem
