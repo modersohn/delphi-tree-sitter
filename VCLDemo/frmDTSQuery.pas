@@ -20,16 +20,31 @@ type
     cbPatternIdx: TComboBox;
     sgPredicateSteps: TStringGrid;
     Splitter2: TSplitter;
+    pnlMatches: TPanel;
+    pnlMatchesTop: TPanel;
+    sgMatchCaptures: TStringGrid;
+    btnMatchStart: TButton;
+    btnMatchNext: TButton;
+    lblMatch: TLabel;
     procedure btnExecuteClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure cbPatternIdxClick(Sender: TObject);
+    procedure btnMatchStartClick(Sender: TObject);
+    procedure btnMatchNextClick(Sender: TObject);
+    procedure sgMatchCapturesSelectCell(Sender: TObject; ACol, ARow: Integer;
+      var CanSelect: Boolean);
   private
     FTree: TTSTree;
     FQuery: TTSQuery;
     FQueryCursor: TTSQueryCursor;
+    FCurrentMatch: TTSQueryMatch;
+    procedure ClearQuery;
+    procedure ClearMatches;
+    procedure ClearPredicates;
   public
-    { Public declarations }
+    procedure TreeDeleted;
+    procedure NewTreeGenerated(ATree: TTSTree);
   end;
 
 var
@@ -39,6 +54,9 @@ procedure ShowQueryForm(ATree: TTSTree);
 
 implementation
 
+uses
+  Math, frmDTSMain;
+
 {$R *.dfm}
 
 procedure ShowQueryForm(ATree: TTSTree);
@@ -47,7 +65,7 @@ begin
   begin
     Application.Createform(TDTSQueryForm, DTSQueryForm);
   end;
-  DTSQueryForm.FTree:= ATree.Clone;
+  DTSQueryForm.FTree:= ATree;
   DTSQueryForm.cbPatternIdxClick(nil);
   DTSQueryForm.Show;
   DTSQueryForm.BringToFront;
@@ -64,8 +82,8 @@ var
   errorType: TTSQueryError;
   i: Integer;
 begin
-  cbPatternIdx.Items.Clear;
-  FreeAndNil(FQuery);
+  ClearQuery;
+
   FQuery:= TTSQuery.Create(FTree.Language, memQuery.Lines.Text, errorOffset, errorType);
   if errorType <> TTSQueryError.TSQueryErrorNone then
   begin
@@ -80,10 +98,48 @@ begin
       [FQuery.PatternCount, FQuery.CaptureCount, FQuery.StringCount]);
     for i:= 0 to FQuery.PatternCount - 1 do
       cbPatternIdx.Items.Add(IntToStr(i));
+    btnMatchStart.Enabled:= True;
   end;
   if cbPatternIdx.Items.Count > 0 then
     cbPatternIdx.ItemIndex:= 0;
   cbPatternIdxClick(nil);
+end;
+
+procedure TDTSQueryForm.btnMatchNextClick(Sender: TObject);
+var
+  i: Integer;
+  captures: TTSQueryCaptureArray;
+begin
+  if not FQueryCursor.NextMatch(FCurrentMatch) then
+  begin
+    ClearMatches;
+    lblMatch.Caption:= 'No more matches';
+    Exit;
+  end;
+  lblMatch.Caption:= Format('Match id = %d, pattern idx = %d', [FCurrentMatch.id, FCurrentMatch.pattern_index]);
+
+  captures:= FCurrentMatch.CapturesArray;
+  sgMatchCaptures.RowCount:= Length(captures) + 1;
+  sgMatchCaptures.FixedRows:= 1;
+  for i:= 0 to FCurrentMatch.capture_count - 1 do
+  begin
+    sgMatchCaptures.Cells[0, i + 1]:= IntToStr(captures[i].index);
+    sgMatchCaptures.Cells[1, i + 1]:= captures[i].node.NodeType;
+  end;
+  if InRange(sgMatchCaptures.Selection.Top, 1, Length(captures)) then
+    DTSMainForm.SelectedTSNode:= captures[sgMatchCaptures.Selection.Top - 1].node;
+end;
+
+procedure TDTSQueryForm.btnMatchStartClick(Sender: TObject);
+begin
+  if FQueryCursor = nil then
+    FQueryCursor:= TTSQueryCursor.Create;
+  FQueryCursor.Execute(FQuery, FTree.RootNode);
+  ClearMatches;
+  sgMatchCaptures.Cells[0, 0]:= 'Capture index';
+  sgMatchCaptures.Cells[1, 0]:= 'Node';
+  btnMatchNext.Enabled:= True;
+  btnMatchNextClick(nil);
 end;
 
 procedure TDTSQueryForm.cbPatternIdxClick(Sender: TObject);
@@ -131,6 +187,28 @@ begin
   end;
 end;
 
+procedure TDTSQueryForm.ClearMatches;
+begin
+  sgMatchCaptures.RowCount:= 1;
+  lblMatch.Caption:= '';
+  btnMatchNext.Enabled:= False;
+end;
+
+procedure TDTSQueryForm.ClearPredicates;
+begin
+  cbPatternIdx.Items.Clear;
+  sgPredicateSteps.RowCount:= 1;
+end;
+
+procedure TDTSQueryForm.ClearQuery;
+begin
+  FreeAndNil(FQuery);
+  btnMatchStart.Enabled:= False;
+  lblQueryState.Caption:= '';
+  ClearPredicates;
+  ClearMatches;
+end;
+
 procedure TDTSQueryForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Action:= caFree;
@@ -140,9 +218,32 @@ procedure TDTSQueryForm.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FQueryCursor);
   FreeAndNil(FQuery);
-  FreeAndNil(FTree);
+  //FTree is no longer a clone/copy but identical to main form, otherwise
+  //finding the node in the main forms tree would not work
+  //(nodes belowing to different trees are not considered equal)
+  FTree:= nil;
   if Self = DTSQueryForm then
     DTSQueryForm:= nil;
+end;
+
+procedure TDTSQueryForm.NewTreeGenerated(ATree: TTSTree);
+begin
+  ClearQuery;
+  FTree:= ATree;
+end;
+
+procedure TDTSQueryForm.sgMatchCapturesSelectCell(Sender: TObject; ACol,
+  ARow: Integer; var CanSelect: Boolean);
+begin
+  if not InRange(ARow, 1, FCurrentMatch.capture_count) then
+    Exit;
+
+  DTSMainForm.SelectedTSNode:= FCurrentMatch.captures[ARow - 1].node;
+end;
+
+procedure TDTSQueryForm.TreeDeleted;
+begin
+  ClearQuery;
 end;
 
 end.

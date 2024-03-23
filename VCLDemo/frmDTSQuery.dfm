@@ -3,7 +3,7 @@ object DTSQueryForm: TDTSQueryForm
   Top = 0
   Caption = 'Query'
   ClientHeight = 441
-  ClientWidth = 624
+  ClientWidth = 764
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,7 +16,7 @@ object DTSQueryForm: TDTSQueryForm
   object Splitter1: TSplitter
     Left = 0
     Top = 250
-    Width = 624
+    Width = 764
     Height = 3
     Cursor = crVSplit
     Align = alTop
@@ -34,7 +34,7 @@ object DTSQueryForm: TDTSQueryForm
   object pnlTop: TPanel
     Left = 0
     Top = 0
-    Width = 624
+    Width = 764
     Height = 50
     Align = alTop
     BevelOuter = bvNone
@@ -58,7 +58,7 @@ object DTSQueryForm: TDTSQueryForm
   object memQuery: TMemo
     Left = 0
     Top = 50
-    Width = 624
+    Width = 764
     Height = 200
     Align = alTop
     Font.Charset = DEFAULT_CHARSET
@@ -113,6 +113,64 @@ object DTSQueryForm: TDTSQueryForm
       RowCount = 2
       Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goFixedRowDefAlign]
       TabOrder = 1
+    end
+  end
+  object pnlMatches: TPanel
+    Left = 353
+    Top = 253
+    Width = 411
+    Height = 188
+    Align = alClient
+    BevelOuter = bvNone
+    TabOrder = 3
+    object pnlMatchesTop: TPanel
+      Left = 0
+      Top = 0
+      Width = 411
+      Height = 41
+      Align = alTop
+      BevelOuter = bvNone
+      TabOrder = 0
+      object lblMatch: TLabel
+        Left = 219
+        Top = 13
+        Width = 3
+        Height = 15
+      end
+      object btnMatchStart: TButton
+        Left = 9
+        Top = 9
+        Width = 120
+        Height = 25
+        Caption = 'Start query cursor'
+        Enabled = False
+        TabOrder = 0
+        OnClick = btnMatchStartClick
+      end
+      object btnMatchNext: TButton
+        Left = 132
+        Top = 9
+        Width = 75
+        Height = 25
+        Caption = 'Next match'
+        Enabled = False
+        TabOrder = 1
+        OnClick = btnMatchNextClick
+      end
+    end
+    object sgMatchCaptures: TStringGrid
+      Left = 0
+      Top = 41
+      Width = 411
+      Height = 147
+      Align = alClient
+      ColCount = 2
+      DefaultColWidth = 120
+      DefaultRowHeight = 18
+      RowCount = 1
+      FixedRows = 0
+      TabOrder = 1
+      OnSelectCell = sgMatchCapturesSelectCell
     end
   end
 end

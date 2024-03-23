@@ -324,16 +324,20 @@ var
 begin
   treeView.Items.Clear;
   sCode:= memCode.Lines.Text;
+  if DTSQueryForm <> nil then
+    DTSQueryForm.TreeDeleted;
+  FreeAndNil(FTree);
   if Length(sCode) = 0 then
     Exit; //avoid our own exception that empty string cannot be parsed
   //we no longer pass OldTree as we would need to track editing and call
   //ts_tree_edit
-  FreeAndNil(FTree);
   FTree:= FParser.ParseString(sCode);
   root:= FTree.RootNode;
   rootNode:= TTSTreeViewNode(treeView.Items.AddChild(nil, root.NodeType));
   rootNode.SetupTSNode(root);
   FEditChanged:= False;
+  if DTSQueryForm <> nil then
+    DTSQueryForm.NewTreeGenerated(FTree);
 end;
 
 procedure TDTSMainForm.SetSelectedTSNode(const Value: TTSNode);

@@ -36,7 +36,14 @@ type
     property Query: PTSQuery read FQuery;
   end;
 
+  TTSQueryCapture = TreeSitterLib.TSQueryCapture;
+  TTSQueryCaptureArray = array of TTSQueryCapture;
+
   TTSQueryMatch = TreeSitterLib.TSQueryMatch;
+
+  TTSQueryMatchHelper = record helper for TTSQueryMatch
+    function CapturesArray: TTSQueryCaptureArray;
+  end;
 
   TTSQueryCursor = class
   strict private
@@ -194,6 +201,15 @@ end;
 procedure TTSQueryCursor.SetMaxStartDepth(AMaxStartDepth: UInt32);
 begin
   ts_query_cursor_set_max_start_depth(FQueryCursor, AMaxStartDepth);
+end;
+
+{ TTSQueryMatchHelper }
+
+function TTSQueryMatchHelper.CapturesArray: TTSQueryCaptureArray;
+begin
+  SetLength(Result, capture_count);
+  if capture_count > 0 then
+    Move(captures[0], Result[0], capture_count * SizeOf(captures[0]));
 end;
 
 end.
