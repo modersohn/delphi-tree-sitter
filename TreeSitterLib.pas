@@ -2,7 +2,7 @@
 
 (*
 
-  Translation of tree-sitter's api.h, at their commit 15e6cd1 from 2024-02-17
+  Translation of tree-sitter's api.h, at their commit 09d2b23 from 2024-03-21
 
   Work in progress. The intention is to leave as much of the original .h unchanged,
   hence the - for Delphi - unusual comment styles
@@ -109,7 +109,7 @@ typedef struct TSInputEdit {
   TSTreeCursor = record
     tree: PTSTree;
     id: Pointer;
-    context: array[1..2] of UInt32;
+    context: array[1..3] of UInt32;
   end;
 
   TSQueryCapture = record
