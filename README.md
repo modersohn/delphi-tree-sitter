@@ -13,7 +13,7 @@ Windows only for now and only tested with Delphi.
 | --- | --- |
 | Parser | Basics covered |
 | Language | Mostly complete |
-| Tree | Basics covered |
+| Tree | Mostly complete |
 | TreeCursor | Mostly complete |
 | Node | Mostly complete |
 | Query | Mostly complete |
@@ -43,9 +43,9 @@ Most parsers do not seem to come with zig-support out of the box, but it should 
 ## VCL demo project
 
 Instead of demoing a typical use-case, the VCL demo is intended to allow exploring the API and functionality that tree-sitter supplies.
-![image](https://github.com/modersohn/delphi-tree-sitter/assets/44807458/3e40aeca-8c4e-4951-8474-bae53563ad3c)
+![image](https://github.com/modersohn/delphi-tree-sitter/assets/44807458/27319bec-f3b6-4a67-8329-f67cc7d9d079)
 
-Currently only supports a few languages and a treeview of named nodes with field name and ID where applicable. Selects the corresponding code part in the memo when a node gets selected.
+Currently supports a handful of languages out of the box and a treeview of nodes with field name and ID where applicable. Selects the corresponding code part in the memo when a node gets selected.
 
 Inspector-like grid with node properties. Navigation via popup menu of the tree. Lists field names of the language and allows finding child node by field ID.
 
@@ -55,4 +55,6 @@ Now with secondary form listing symbols, fields and version of the language:
 New query form, showing info about the query and allowing iterating over matches and listing their captures. Selecting a capture, selects the captured node in the main form and selects the corresponding code section:
 ![image](https://github.com/modersohn/delphi-tree-sitter/assets/44807458/ac2cba4f-06b2-4a02-8bb4-d02f5adac857)
 
+## Console demo project loading .pas
 
+[Simple console project](ConsoleReadPasFile.dpr) which demonstrates TTSParser.Parse called with an anonymous method for reading the text to parse.
