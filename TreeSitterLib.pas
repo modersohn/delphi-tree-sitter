@@ -75,11 +75,13 @@ typedef struct TSRange {
   uint32_t start_byte;
   uint32_t end_byte;
 } TSRange;
-typedef struct TSInput {
-  void *payload;
-  const char *(*read)(void *payload, uint32_t byte_index, TSPoint position, uint32_t *bytes_read);
-  TSInputEncoding encoding;
-} TSInput;
+*)
+  TSInput = record
+    payload: Pointer;
+    read: function (payload: Pointer; byte_index: UInt32; position: TSPoint; var bytes_read: UInt32): PAnsiChar; cdecl;
+    encoding: TSInputEncoding;
+  end;
+(*
 typedef enum TSLogType {
   TSLogTypeParse,
   TSLogTypeLex,
@@ -230,6 +232,8 @@ const TSRange *ts_parser_included_ranges(
   const TSParser *self,
   uint32_t *count
 );
+}
+(*
 /**
  * Use the parser to parse some source code and create a syntax tree.
  *
@@ -273,12 +277,12 @@ const TSRange *ts_parser_included_ranges(
  * [`encoding`]: TSInput::encoding
  * [`bytes_read`]: TSInput::read
  */
-TSTree *ts_parser_parse(
-  TSParser *self,
-  const TSTree *old_tree,
-  TSInput input
-);
-}
+*)
+function ts_parser_parse(
+  self: PTSParser;
+  const old_tree: PTSTree;
+  input: TSInput
+): PTSTree; cdecl; external ModuleName;
 (*
 /**
  * Use the parser to parse some source code stored in one contiguous buffer.

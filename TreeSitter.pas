@@ -45,6 +45,10 @@ type
   TTSNode = TSNode;
   TTSPoint = TSPoint;
 
+  TTSInputEncoding = TreeSitterLib.TSInputEncoding;
+
+  TTSParseReadFunction = reference to function (AByteIndex: UInt32; APosition: TTSPoint; var ABytesRead: UInt32): TBytes;
+
   TTSParser = class
   strict private
     FParser: PTSParser;
@@ -56,7 +60,9 @@ type
 
     procedure Reset;
 
-    function ParseString(const AString: string; const OldTree: TTSTree = nil): TTSTree;
+    function ParseString(const AString: string; const AOldTree: TTSTree = nil): TTSTree;
+    function Parse(AParseReadFunction: TTSParseReadFunction;
+      AEncoding: TTSInputEncoding; const AOldTree: TTSTree = nil): TTSTree;
 
     property Parser: PTSParser read FParser;
     property Language: PTSLanguage read GetLanguage write SetLanguage;
@@ -177,8 +183,36 @@ begin
   Result:= ts_parser_language(FParser);
 end;
 
+type
+  PTSInputReadPayLoad = ^TSInputReadPayLoad;
+  TSInputReadPayLoad = record
+    ParseReadFunction: TTSParseReadFunction;
+    Buffer: TBytes;
+  end;
+
+function TSInputRead(payload: Pointer; byte_index: UInt32; position: TSPoint; var bytes_read: UInt32): PAnsiChar; cdecl;
+begin
+  PTSInputReadPayLoad(payload)^.Buffer:= PTSInputReadPayLoad(payload)^.ParseReadFunction(byte_index, position, bytes_read);
+  if Length(PTSInputReadPayLoad(payload)^.Buffer) = 0 then
+    Result:= nil else
+    Result:= PAnsiChar(@PTSInputReadPayLoad(payload)^.Buffer[0]);
+end;
+
+function TTSParser.Parse(AParseReadFunction: TTSParseReadFunction;
+  AEncoding: TTSInputEncoding; const AOldTree: TTSTree): TTSTree;
+var
+  tsi: TSInput;
+  payload: TSInputReadPayLoad;
+begin
+  payload.ParseReadFunction:= AParseReadFunction;
+  tsi.payload:= @payload;
+  tsi.read:= TSInputRead;
+  tsi.encoding:= AEncoding;
+  Result:= TTSTree.Create(ts_parser_parse(FParser, AOldTree.TreeNilSafe, tsi));
+end;
+
 function TTSParser.ParseString(const AString: string;
-  const OldTree: TTSTree): TTSTree;
+  const AOldTree: TTSTree): TTSTree;
 var
   bytes: TBytes;
   tree: PTSTree;
@@ -187,7 +221,7 @@ begin
   bytes:= TEncoding.Unicode.GetBytes(AString);
   len:= Length(bytes);
   if len > 0 then
-    tree:= ts_parser_parse_string_encoding(FParser, OldTree.TreeNilSafe,
+    tree:= ts_parser_parse_string_encoding(FParser, AOldTree.TreeNilSafe,
       @bytes[0], len, TSInputEncodingUTF16) else
     raise ETreeSitterException.Create('Cannot parse empty string');
   if tree = nil then
